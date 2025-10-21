@@ -4,25 +4,15 @@ using TMPro;
 public class DiceRoll : MonoBehaviour
 {
     public TextMeshProUGUI wheelSpinText;
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public int wheelValue;
+    public int wheelSpun = 0;
+    public void SpinTheWheel()
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    public int WheelValue;
-
-    public void SpinTheWheel() 
-    {
-        WheelValue = Random.Range( 0, 8);
-        Debug.Log("Rolled: " + WheelValue);
-        wheelSpinText.text = (WheelValue.ToString());
+        wheelSpun++;
+        Debug.Log(wheelSpun);
+        wheelValue = Random.Range( 0, 8);
+        Debug.Log("Rolled: " + wheelValue);
+        wheelSpinText.text = (wheelValue.ToString());
     }
 
     
