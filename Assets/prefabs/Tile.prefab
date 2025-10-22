@@ -55,7 +55,7 @@ GameObject:
   - component: {fileID: 768885918038032786}
   - component: {fileID: -3906802486992478996}
   m_Layer: 0
-  m_Name: Policko
+  m_Name: Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

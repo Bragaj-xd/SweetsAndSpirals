@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public GameObject redPlayer;
     public GameObject bluePlayer;
     public DiceRoll diceRoll;
+    public GameObject cardPrefab;
 
     private int lastWheelNum = 0;
 
@@ -68,17 +69,23 @@ public class GameManager : MonoBehaviour
             // Increment move counter
             playerToMove++;
             lastWheelNum = diceRoll.wheelSpun;
-
+            
             // Decide who moves this turn
             if (playerToMove % 2 == 0)
             {
                 redToMove = true;
-                UpdateRedPosition(); // Move red player once
+                if (diceRoll.wheelValue <= 6)
+                    UpdateRedPosition(); // Move red player once
+                else
+                    AddChanceCard(redPlayer);
             }
             else
             {
                 redToMove = false;
-                UpdateBluePosition(); // Move blue player once
+                if (diceRoll.wheelValue <= 6)
+                    UpdateBluePosition(); // Move blue player once
+                else
+                    AddChanceCard(bluePlayer);
             }
         }
         if (redPlayer.GetComponent<PlayerStats>().currentPos >= 99)
@@ -143,5 +150,27 @@ public class GameManager : MonoBehaviour
     void UpdateBluePosition()
     {
         FindTile(bluePlayer.GetComponent<PlayerStats>().currentPos);
+    }
+    void AddChanceCard(GameObject player)
+    {
+        GameObject newCard = SpawnCard();
+
+        player.GetComponent<PlayerStats>().cards.Add(newCard);
+
+        Debug.Log($"Added card {newCard.name} to {player.name}'s cards!");
+    }
+    
+    int PickRandomCard()
+    {
+        return Random.Range(0, 8);
+    }
+    GameObject SpawnCard()
+    {
+        Vector3 pos = new Vector3(0f, 0f);
+        GameObject newCard = Instantiate(cardPrefab, pos, Quaternion.identity, transform);
+        newCard.name = "Card";
+        newCard.GetComponent<CardStats>().cardId = PickRandomCard();
+
+        return newCard;
     }
 }

@@ -513,7 +513,7 @@ GameObject:
   m_Component:
   - component: {fileID: 337446725768059136}
   m_Layer: 0
-  m_Name: Koleso
+  m_Name: Wheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
