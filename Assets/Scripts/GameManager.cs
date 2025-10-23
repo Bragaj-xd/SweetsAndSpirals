@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour
             {
                 redToMove = true;
                 if (diceRoll.wheelValue <= 6)
-                    UpdateRedPosition(); // Move red player once
+                    UpdatePlayerPosition(redPlayer); // Move red player once
                 else
                     AddChanceCard(redPlayer);
             }
@@ -83,7 +83,7 @@ public class GameManager : MonoBehaviour
             {
                 redToMove = false;
                 if (diceRoll.wheelValue <= 6)
-                    UpdateBluePosition(); // Move blue player once
+                    UpdatePlayerPosition(bluePlayer); // Move blue player once
                 else
                     AddChanceCard(bluePlayer);
             }
@@ -105,18 +105,66 @@ public class GameManager : MonoBehaviour
     void FindTile(int currentPlayerPos)
     {
         int targetTileID = currentPlayerPos + diceRoll.wheelValue;
-
+        Transform redMarker = null;
+        Transform blueMarker = null;
         foreach (Tile t in floorManager.tiles)
         {
             if (t.tileID == targetTileID)
             {
+                switch (t.tileFunction)
+                {
+                    case 0:
+                        if (redToMove)
+                        {
+                            redMarker = t.transform.Find("Red Position");
+                        }
+                        else
+                        {
+                            blueMarker = t.transform.Find("Blue Position");
+                        }
+                        break;
+                    case 1:
+                        Debug.Log("stepped on a ladder");
+                        foreach (GameObject l in floorManager.ladders)
+                        {
+                            if (l.GetComponent<Ladder>().startTile == targetTileID)
+                            {
+                                int newTargetID = l.GetComponent<Ladder>().endTile;
+                                foreach (Tile ts in floorManager.tiles)
+                                {
+                                    if (ts.tileID == newTargetID)
+                                    {
+                                        if (redToMove)
+                                        {
+                                            redMarker = ts.transform.Find("Red Position");
+                                        }
+                                            
+                                        else
+                                        {
+                                            blueMarker = ts.transform.Find("Blue Position");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 2:
+                        if (redToMove)
+                        {
+                            redMarker = t.transform.Find("Red Position");
+                        }
+                        else
+                        {
+                            blueMarker = t.transform.Find("Blue Position");
+                        }
+                        break;
+                }
                 if (redToMove)
                 {
-                    Transform redMarker = t.transform.Find("Red Position");
                     if (redMarker != null)
                     {
                         redPlayer.transform.position = redMarker.position;
-                        redPlayer.GetComponent<PlayerStats>().currentPos = t.tileID;
+                        redPlayer.GetComponent<PlayerStats>().currentPos = redMarker.GetComponentInParent<Tile>().tileID;
                     }
                     else
                     {
@@ -125,11 +173,10 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    Transform blueMarker = t.transform.Find("Blue Position");
                     if (blueMarker != null)
                     {
                         bluePlayer.transform.position = blueMarker.position;
-                        bluePlayer.GetComponent<PlayerStats>().currentPos = t.tileID;
+                        bluePlayer.GetComponent<PlayerStats>().currentPos = blueMarker.GetComponentInParent<Tile>().tileID;
                     }
                     else
                     {
@@ -142,14 +189,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void UpdateRedPosition()
+    void UpdatePlayerPosition(GameObject player)
     {
-        FindTile(redPlayer.GetComponent<PlayerStats>().currentPos);
-    }
-
-    void UpdateBluePosition()
-    {
-        FindTile(bluePlayer.GetComponent<PlayerStats>().currentPos);
+        FindTile(player.GetComponent<PlayerStats>().currentPos);
     }
     void AddChanceCard(GameObject player)
     {

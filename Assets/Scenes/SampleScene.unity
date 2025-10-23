@@ -836,6 +836,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rebrik pist long
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 01566ff5bf91a774db8a00a2495db606, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3280927520727180574, guid: 01566ff5bf91a774db8a00a2495db606, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -1546,6 +1550,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 5e0839d201748cf429820b928ce10c45, type: 3}
       propertyPath: m_Name
       value: rebrik straw kr
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5e0839d201748cf429820b928ce10c45, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1129496810705857465, guid: 5e0839d201748cf429820b928ce10c45, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -3604,6 +3612,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 5e0839d201748cf429820b928ce10c45, type: 3}
       propertyPath: m_Name
       value: rebrik choc kr
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5e0839d201748cf429820b928ce10c45, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1129496810705857465, guid: 5e0839d201748cf429820b928ce10c45, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -5941,9 +5953,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FloorManager
   tilePrefab: {fileID: 2727332041335744800, guid: c1d47082c44075d48964f3f1b78326a4, type: 3}
+  ladderPrefab: {fileID: 1487118692208556441, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
   width: 10
   height: 10
   tileSize: 1.2
+  ladders: []
 --- !u!4 &1168863200
 Transform:
   m_ObjectHideFlags: 0
