@@ -1,6 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class GameManager : MonoBehaviour
     public GameObject bluePlayer;
     public DiceRoll diceRoll;
     public GameObject cardPrefab;
+
+    public bool inputMenu;
 
     private int lastWheelNum = 0;
 
@@ -55,14 +58,18 @@ public class GameManager : MonoBehaviour
                 break;
             }
         }
-        if(winScreenText != null)
         {
             winScreenText.gameObject.SetActive(false);
         }
     }
 
+    public void OnMenu(InputAction.CallbackContext context) => inputMenu = context.ReadValueAsButton();
     void Update()
     {
+        if(inputMenu)
+        {
+            Application.Quit();
+        }
         // Check if dice was just spun
         if (diceRoll.wheelSpun > lastWheelNum)
         {
