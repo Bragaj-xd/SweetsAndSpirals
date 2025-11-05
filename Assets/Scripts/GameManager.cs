@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviour
                 break;
             }
         }
+        if(winScreenText != null)
         {
             winScreenText.gameObject.SetActive(false);
         }
@@ -156,6 +157,41 @@ public class GameManager : MonoBehaviour
                         }
                         break;
                     case 2:
+                        if (redToMove)
+                        {
+                            redMarker = t.transform.Find("Red Position");
+                        }
+                        else
+                        {
+                            blueMarker = t.transform.Find("Blue Position");
+                        }
+                        break;
+                    case 3:
+                        Debug.Log("stepped on a snake");
+                        foreach (GameObject s in floorManager.snakes)
+                        {
+                            if (s.GetComponent<Snake>().startTile == targetTileID)
+                            {
+                                int newTargetID = s.GetComponent<Snake>().endTile;
+                                foreach (Tile ts in floorManager.tiles)
+                                {
+                                    if (ts.tileID == newTargetID)
+                                    {
+                                        if (redToMove)
+                                        {
+                                            redMarker = ts.transform.Find("Red Position");
+                                        }
+                                            
+                                        else
+                                        {
+                                            blueMarker = ts.transform.Find("Blue Position");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 4:
                         if (redToMove)
                         {
                             redMarker = t.transform.Find("Red Position");

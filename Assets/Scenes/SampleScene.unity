@@ -6002,10 +6002,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FloorManager
   tilePrefab: {fileID: 2727332041335744800, guid: c1d47082c44075d48964f3f1b78326a4, type: 3}
   ladderPrefab: {fileID: 1487118692208556441, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+  snakePrefab: {fileID: 1487118692208556441, guid: 66691615dc1e7924c938b5d1c6e4b26b, type: 3}
   width: 10
   height: 10
   tileSize: 1.2
   ladders: []
+  snakes: []
 --- !u!4 &1168863200
 Transform:
   m_ObjectHideFlags: 0
