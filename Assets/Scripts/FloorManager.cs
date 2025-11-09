@@ -79,9 +79,9 @@ public class FloorManager : MonoBehaviour
     {
         int ladderCount = Random.Range(5, 10);
 
-        for (int i = 0; i < ladderCount; i++) // use < not <=
+        for (int i = 0; i < ladderCount; i++)
         {
-            int randomTileStart = Random.Range(0, tiles.Length); // tileID range: 0 .. tiles.Length-1
+            int randomTileStart = Random.Range(10, tiles.Length - 20); // tileID range: 0 .. tiles.Length-1
 
             // find start tile by ID
             Tile startTile = null;
@@ -93,6 +93,16 @@ public class FloorManager : MonoBehaviour
                     startTile = t;
                     break;
                 }
+                for (int tileOffset = -5; tileOffset < 6; tileOffset++)
+                {
+                    if(t.tileID == randomTileStart + tileOffset)
+                    {
+                        if(t.tileFunction != 0)
+                        {
+                            startTile = null;
+                        }
+                    }
+                }
             }
 
             // if not found or already used for ladder start/end, pick another
@@ -102,7 +112,7 @@ public class FloorManager : MonoBehaviour
                 bool found = false;
                 for (int tries = 0; tries < 8 && !found; tries++)
                 {
-                    randomTileStart = Random.Range(0, tiles.Length);
+                    randomTileStart = Random.Range(10, tiles.Length-20);
                     foreach (Tile t in tiles)
                     {
                         if (t == null) continue;
@@ -120,8 +130,8 @@ public class FloorManager : MonoBehaviour
             // pick an end tile ID some steps ahead; clamp so it stays in range
             int minEnd = randomTileStart + 10;
             int maxEnd = randomTileStart + 25;
-            minEnd = Mathf.Clamp(minEnd, 0, tiles.Length - 1);
-            maxEnd = Mathf.Clamp(maxEnd, 0, tiles.Length - 1);
+            minEnd = Mathf.Clamp(minEnd, 0, tiles.Length - 10);
+            maxEnd = Mathf.Clamp(maxEnd, 0, tiles.Length - 10);
             if (minEnd > maxEnd) { int tmp = minEnd; minEnd = maxEnd; maxEnd = tmp; }
 
             int randomTileEnd = Random.Range(minEnd, maxEnd + 1); // inclusive upper bound
@@ -180,7 +190,7 @@ public class FloorManager : MonoBehaviour
 
         for (int i = 0; i < snakesCount; i++) // use < not <=
         {
-            int randomTileStart = Random.Range(0, tiles.Length); // tileID range: 0 .. tiles.Length-1
+            int randomTileStart = Random.Range(10, tiles.Length - 20); // tileID range: 0 .. tiles.Length-1
 
             // find start tile by ID
             Tile startTile = null;
@@ -192,7 +202,18 @@ public class FloorManager : MonoBehaviour
                     startTile = t;
                     break;
                 }
+                for (int tileOffset = -5; tileOffset < 6; tileOffset++)
+                {
+                    if(t.tileID == randomTileStart + tileOffset)
+                    {
+                        if(t.tileFunction != 0)
+                        {
+                            startTile = null;
+                        }
+                    }
+                }
             }
+
 
             // if not found or already used for ladder start/end, pick another
             if (startTile == null || startTile.tileFunction == 1 || startTile.tileFunction == 2)
@@ -201,7 +222,7 @@ public class FloorManager : MonoBehaviour
                 bool found = false;
                 for (int tries = 0; tries < 8 && !found; tries++)
                 {
-                    randomTileStart = Random.Range(0, tiles.Length);
+                    randomTileStart = Random.Range(10, tiles.Length - 20);
                     foreach (Tile t in tiles)
                     {
                         if (t == null) continue;
@@ -219,8 +240,8 @@ public class FloorManager : MonoBehaviour
             // pick an end tile ID some steps ahead; clamp so it stays in range
             int minEnd = randomTileStart - 10;
             int maxEnd = randomTileStart - 25;
-            minEnd = Mathf.Clamp(minEnd, 0, tiles.Length - 1);
-            maxEnd = Mathf.Clamp(maxEnd, 0, tiles.Length - 1);
+            minEnd = Mathf.Clamp(minEnd, 0, tiles.Length - 10);
+            maxEnd = Mathf.Clamp(maxEnd, 0, tiles.Length - 10);
             if (minEnd > maxEnd) { int tmp = minEnd; minEnd = maxEnd; maxEnd = tmp; }
 
             int randomTileEnd = Random.Range(minEnd, maxEnd + 1); // inclusive upper bound
