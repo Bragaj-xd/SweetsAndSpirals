@@ -75,223 +75,205 @@ public class FloorManager : MonoBehaviour
             return tiles[x, z];
         return null;
     }
+
     void GenerateLadders()
     {
         int ladderCount = Random.Range(5, 10);
-
+        Debug.Log(ladderCount);
+        int randomTileStart;
         for (int i = 0; i < ladderCount; i++)
         {
-            int randomTileStart = Random.Range(10, tiles.Length - 20); // tileID range: 0 .. tiles.Length-1
-
-            // find start tile by ID
-            Tile startTile = null;
-            foreach (Tile t in tiles)
+            for(int y = 0; y < 10; y++)
             {
-                if (t == null) continue;
-                if (t.tileID == randomTileStart)
+                // tileID range: 0 .. tiles.Length-1
+                randomTileStart = Random.Range(5, tiles.Length - 10);
+                // find start tile by ID
+
+                Tile startTile = FindStartTile(randomTileStart);
+                if (startTile == null)
                 {
-                    startTile = t;
-                    break;
+                    Debug.Log($"No valid start tile at {randomTileStart} " + y);
+                    
+                    
+                    continue;
                 }
-                for (int tileOffset = -5; tileOffset < 6; tileOffset++)
+            
+        
+
+
+                // pick an end tile ID some steps ahead; clamp so it stays in range
+                int minEnd = randomTileStart + 10;
+                int maxEnd = randomTileStart + 25;
+                minEnd = Mathf.Clamp(minEnd, 0, tiles.Length - 10);
+                maxEnd = Mathf.Clamp(maxEnd, 0, tiles.Length - 10);
+                if (minEnd > maxEnd) { int tmp = minEnd; minEnd = maxEnd; maxEnd = tmp; }
+
+                int randomTileEnd = Random.Range(minEnd, maxEnd + 1); // inclusive upper bound
+
+                // find end tile by ID
+                Tile endTile = null;
+                foreach (Tile ts in tiles)
                 {
-                    if(t.tileID == randomTileStart + tileOffset)
+                    if (ts == null) continue;
+                    if (ts.tileID == randomTileEnd)
                     {
-                        if(t.tileFunction != 0)
-                        {
-                            startTile = null;
-                        }
+                        endTile = ts;
+                        Debug.Log(endTile);
+                        break;
                     }
                 }
-            }
 
-            // if not found or already used for ladder start/end, pick another
-            if (startTile == null || startTile.tileFunction == 1 || startTile.tileFunction == 2)
-            {
-                // try a few more random picks before skipping
-                bool found = false;
-                for (int tries = 0; tries < 8 && !found; tries++)
+                if (endTile == null) continue; // no matching end tile found — skip
+
+                // mark functions
+                Debug.Log(startTile);
+                startTile.tileFunction = 1;
+                endTile.tileFunction = 2;
+
+                // instantiate ladder at the ladder position child of the start tile
+                Vector3 pos = startTile.GetComponentInChildren<LadderPos>().transform.position;
+                GameObject newLadder = Instantiate(ladderPrefab, pos, Quaternion.identity, transform);
+
+                // set ladder IDs on Ladder component
+                Ladder ladderComp = newLadder.GetComponent<Ladder>();
+                if (ladderComp != null)
                 {
-                    randomTileStart = Random.Range(10, tiles.Length-20);
-                    foreach (Tile t in tiles)
-                    {
-                        if (t == null) continue;
-                        if (t.tileID == randomTileStart && t.tileFunction != 1 && t.tileFunction != 2)
-                        {
-                            startTile = t;
-                            found = true;
-                            break;
-                        }
-                    }
+                    ladderComp.startTile = startTile.tileID;
+                    ladderComp.endTile = endTile.tileID;
                 }
-                if (!found) continue; // couldn't find a good start this iteration
+
+                // compute direct direction from start to end
+                Vector3 targetDirection = endTile.transform.position - startTile.transform.position;
+                if (targetDirection.sqrMagnitude <= Mathf.Epsilon) continue;
+
+                // use LookRotation to face the target
+                Quaternion look = Quaternion.LookRotation(targetDirection.normalized);
+
+                // APPLY A YAW OFFSET if your ladder model's forward axis is rotated.
+                // The common fix when things are off by -90° yaw is to multiply by this:
+                Quaternion yawOffset = Quaternion.Euler(0f, -90f, 0f);
+                // If it's off by +90°, change to Quaternion.Euler(0f, 90f, 0f).
+
+                newLadder.transform.rotation = look * yawOffset;
+                ladders.Add(newLadder);
+                Debug.Log($"{startTile.tileID} to {endTile.tileID}");
+                break;
             }
-
-            // pick an end tile ID some steps ahead; clamp so it stays in range
-            int minEnd = randomTileStart + 10;
-            int maxEnd = randomTileStart + 25;
-            minEnd = Mathf.Clamp(minEnd, 0, tiles.Length - 10);
-            maxEnd = Mathf.Clamp(maxEnd, 0, tiles.Length - 10);
-            if (minEnd > maxEnd) { int tmp = minEnd; minEnd = maxEnd; maxEnd = tmp; }
-
-            int randomTileEnd = Random.Range(minEnd, maxEnd + 1); // inclusive upper bound
-
-            // find end tile by ID
-            Tile endTile = null;
-            foreach (Tile ts in tiles)
-            {
-                if (ts == null) continue;
-                if (ts.tileID == randomTileEnd)
-                {
-                    endTile = ts;
-                    break;
-                }
-            }
-
-            if (endTile == null) continue; // no matching end tile found — skip
-
-            // mark functions
-            startTile.tileFunction = 1;
-            endTile.tileFunction = 2;
-
-            // instantiate ladder at the ladder position child of the start tile
-            Vector3 pos = startTile.GetComponentInChildren<LadderPos>().transform.position;
-            GameObject newLadder = Instantiate(ladderPrefab, pos, Quaternion.identity, transform);
-
-            // set ladder IDs on Ladder component
-            Ladder ladderComp = newLadder.GetComponent<Ladder>();
-            if (ladderComp != null)
-            {
-                ladderComp.startTile = startTile.tileID;
-                ladderComp.endTile = endTile.tileID;
-            }
-
-            // compute direct direction from start to end
-            Vector3 targetDirection = endTile.transform.position - startTile.transform.position;
-            if (targetDirection.sqrMagnitude <= Mathf.Epsilon) continue;
-
-            // use LookRotation to face the target
-            Quaternion look = Quaternion.LookRotation(targetDirection.normalized);
-
-            // APPLY A YAW OFFSET if your ladder model's forward axis is rotated.
-            // The common fix when things are off by -90° yaw is to multiply by this:
-            Quaternion yawOffset = Quaternion.Euler(0f, -90f, 0f);
-            // If it's off by +90°, change to Quaternion.Euler(0f, 90f, 0f).
-
-            newLadder.transform.rotation = look * yawOffset;
-            ladders.Add(newLadder);
-            Debug.Log($"{startTile.tileID} to {endTile.tileID}");
         }
     }
 
     void GenerateSnakes()
     {
         int snakesCount = Random.Range(5, 10);
-
+        Debug.Log(snakesCount);
+        int randomTileStart;
         for (int i = 0; i < snakesCount; i++) // use < not <=
         {
-            int randomTileStart = Random.Range(10, tiles.Length - 20); // tileID range: 0 .. tiles.Length-1
-
-            // find start tile by ID
-            Tile startTile = null;
-            foreach (Tile t in tiles)
+            for(int y = 0; y < 10; y++)
             {
-                if (t == null) continue;
-                if (t.tileID == randomTileStart)
+                // tileID range: 0 .. tiles.Length-1
+                randomTileStart = Random.Range(20, tiles.Length);
+                // find start tile by ID
+
+                Tile startTile = FindStartTile(randomTileStart);
+                if (startTile == null)
                 {
-                    startTile = t;
-                    break;
+                    Debug.Log($"No valid start tile at {randomTileStart} " + y);
+                    //i--;
+                    
+                    continue;
                 }
-                for (int tileOffset = -5; tileOffset < 6; tileOffset++)
+
+                // pick an end tile ID some steps ahead; clamp so it stays in range
+                int minEnd = randomTileStart - 10;
+                int maxEnd = randomTileStart - 35;
+                minEnd = Mathf.Clamp(minEnd, 0, tiles.Length - 10);
+                maxEnd = Mathf.Clamp(maxEnd, 0, tiles.Length - 10);
+                if (minEnd > maxEnd) { int tmp = minEnd; minEnd = maxEnd; maxEnd = tmp; }
+
+                int randomTileEnd = Random.Range(minEnd, maxEnd + 1); // inclusive upper bound
+
+                // find end tile by ID
+                Tile endTile = null;
+                foreach (Tile ts in tiles)
                 {
-                    if(t.tileID == randomTileStart + tileOffset)
+                    if (ts == null) continue;
+                    if (ts.tileID == randomTileEnd)
                     {
-                        if(t.tileFunction != 0)
-                        {
-                            startTile = null;
-                        }
+                        endTile = ts;
+                        break;
                     }
                 }
-            }
 
+                if (endTile == null) continue; // no matching end tile found — skip
 
-            // if not found or already used for ladder start/end, pick another
-            if (startTile == null || startTile.tileFunction == 1 || startTile.tileFunction == 2)
-            {
-                // try a few more random picks before skipping
-                bool found = false;
-                for (int tries = 0; tries < 8 && !found; tries++)
+                // mark functions
+                startTile.tileFunction = 3;
+                endTile.tileFunction = 4;
+
+                // instantiate ladder at the ladder position child of the start tile
+                Vector3 pos = startTile.GetComponentInChildren<SnakePos>().transform.position;
+                GameObject newSnake = Instantiate(snakePrefab, pos, Quaternion.identity, transform);
+
+                // set ladder IDs on Ladder component
+                Snake snakeComp = newSnake.GetComponent<Snake>();
+                if (snakeComp != null)
                 {
-                    randomTileStart = Random.Range(10, tiles.Length - 20);
-                    foreach (Tile t in tiles)
-                    {
-                        if (t == null) continue;
-                        if (t.tileID == randomTileStart && t.tileFunction != 1 && t.tileFunction != 2)
-                        {
-                            startTile = t;
-                            found = true;
-                            break;
-                        }
-                    }
+                    snakeComp.startTile = startTile.tileID;
+                    snakeComp.endTile = endTile.tileID;
                 }
-                if (!found) continue; // couldn't find a good start this iteration
+
+                // compute direct direction from start to end
+                Vector3 targetDirection = endTile.transform.position - startTile.transform.position;
+                if (targetDirection.sqrMagnitude <= Mathf.Epsilon) continue;
+
+                // use LookRotation to face the target
+                Quaternion look = Quaternion.LookRotation(targetDirection.normalized);
+
+                // APPLY A YAW OFFSET if your ladder model's forward axis is rotated.
+                // The common fix when things are off by -90° yaw is to multiply by this:
+                Quaternion yawOffset = Quaternion.Euler(0f, -90f, 0f);
+                // If it's off by +90°, change to Quaternion.Euler(0f, 90f, 0f).
+
+                newSnake.transform.rotation = look * yawOffset;
+                snakes.Add(newSnake);
+                Debug.Log($"{startTile.tileID} to {endTile.tileID}");
+                break;
             }
-
-            // pick an end tile ID some steps ahead; clamp so it stays in range
-            int minEnd = randomTileStart - 10;
-            int maxEnd = randomTileStart - 25;
-            minEnd = Mathf.Clamp(minEnd, 0, tiles.Length - 10);
-            maxEnd = Mathf.Clamp(maxEnd, 0, tiles.Length - 10);
-            if (minEnd > maxEnd) { int tmp = minEnd; minEnd = maxEnd; maxEnd = tmp; }
-
-            int randomTileEnd = Random.Range(minEnd, maxEnd + 1); // inclusive upper bound
-
-            // find end tile by ID
-            Tile endTile = null;
-            foreach (Tile ts in tiles)
-            {
-                if (ts == null) continue;
-                if (ts.tileID == randomTileEnd)
-                {
-                    endTile = ts;
-                    break;
-                }
-            }
-
-            if (endTile == null) continue; // no matching end tile found — skip
-
-            // mark functions
-            startTile.tileFunction = 3;
-            endTile.tileFunction = 4;
-
-            // instantiate ladder at the ladder position child of the start tile
-            Vector3 pos = startTile.GetComponentInChildren<SnakePos>().transform.position;
-            GameObject newSnake = Instantiate(snakePrefab, pos, Quaternion.identity, transform);
-
-            // set ladder IDs on Ladder component
-            Snake snakeComp = newSnake.GetComponent<Snake>();
-            if (snakeComp != null)
-            {
-                snakeComp.startTile = startTile.tileID;
-                snakeComp.endTile = endTile.tileID;
-            }
-
-            // compute direct direction from start to end
-            Vector3 targetDirection = endTile.transform.position - startTile.transform.position;
-            if (targetDirection.sqrMagnitude <= Mathf.Epsilon) continue;
-
-            // use LookRotation to face the target
-            Quaternion look = Quaternion.LookRotation(targetDirection.normalized);
-
-            // APPLY A YAW OFFSET if your ladder model's forward axis is rotated.
-            // The common fix when things are off by -90° yaw is to multiply by this:
-            Quaternion yawOffset = Quaternion.Euler(0f, -90f, 0f);
-            // If it's off by +90°, change to Quaternion.Euler(0f, 90f, 0f).
-
-            newSnake.transform.rotation = look * yawOffset;
-            snakes.Add(newSnake);
-            Debug.Log($"{startTile.tileID} to {endTile.tileID}");
         }
     }
+    Tile FindTileByID(int id)
+    {
+        foreach (Tile t in tiles)
+        {
+            if (t != null && t.tileID == id)
+                return t;
+        }
+        return null;
+    }
+
+    Tile FindStartTile(int centerID)
+    {
+        // Find the center tile
+        Tile center = FindTileByID(centerID);
+        if (center == null) return null;
+
+        // Check +-5 range
+        for (int offset = -5; offset <= 5; offset++)
+        {
+            int checkID = centerID + offset;
+            Tile checkTile = FindTileByID(checkID);
+
+            if (checkTile == null) continue;
+
+            // If ANY neighbor is occupied → invalid start tile
+            if (checkTile.tileFunction != 0)
+                return null;
+        }
+
+        // All checks passed
+        return center;
+    }
+
     
 }
