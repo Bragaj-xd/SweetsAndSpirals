@@ -76,7 +76,7 @@ public class FloorManager : MonoBehaviour
     }
 
 
-    Tile FindTileByID(int id)
+    public Tile FindTileByID(int id)
     {
         foreach (Tile t in tiles)
         {

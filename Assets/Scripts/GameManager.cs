@@ -2,6 +2,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class GameManager : MonoBehaviour
     public GameObject bluePlayer;
     public DiceRoll diceRoll;
     public GameObject cardPrefab;
+
+    public bool playerInMovement;
 
     public bool inputMenu;
 
@@ -206,8 +209,14 @@ public class GameManager : MonoBehaviour
                 {
                     if (redMarker != null)
                     {
-                        redPlayer.transform.position = redMarker.position;
-                        redPlayer.GetComponent<PlayerStats>().currentPos = redMarker.GetComponentInParent<Tile>().tileID;
+                        StartCoroutine(MovePlayerTileByTile(
+                            redPlayer,
+                            redPlayer.GetComponent<PlayerStats>().currentPos + 1,
+                            redMarker.GetComponentInParent<Tile>().tileID
+                        ));
+
+                        //redPlayer.transform.position = redMarker.position;
+                        //redPlayer.GetComponent<PlayerStats>().currentPos = redMarker.GetComponentInParent<Tile>().tileID;
                     }
                     else
                     {
@@ -218,15 +227,17 @@ public class GameManager : MonoBehaviour
                 {
                     if (blueMarker != null)
                     {
-                        bluePlayer.transform.position = blueMarker.position;
-                        bluePlayer.GetComponent<PlayerStats>().currentPos = blueMarker.GetComponentInParent<Tile>().tileID;
+                        StartCoroutine(MovePlayerTileByTile(
+                            bluePlayer,
+                            bluePlayer.GetComponent<PlayerStats>().currentPos + 1,
+                            blueMarker.GetComponentInParent<Tile>().tileID
+                        ));
                     }
                     else
                     {
                         Debug.LogWarning($"Tile {t.tileID} missing BluePos marker!");
                     }
                 }
-
                 break;
             }
         }
@@ -257,5 +268,30 @@ public class GameManager : MonoBehaviour
         newCard.GetComponent<CardStats>().cardId = PickRandomCard();
 
         return newCard;
+    }
+
+    IEnumerator MovePlayerTileByTile(GameObject player, int start, int end)
+    {
+        playerInMovement = true;
+        for (int i = start; i <= end; i++)
+        {
+            Tile tile = floorManager.FindTileByID(i);
+            if (tile == null) yield break;
+
+            // Move player to this tile's marker
+            string markerName = redToMove ? "Red Position" : "Blue Position";
+            Transform marker = tile.transform.Find(markerName);
+
+            player.transform.position = marker.position;
+            player.GetComponent<PlayerStats>().currentPos = i;
+
+            Debug.Log($"Step on tile {i}");
+
+            // Wait before moving to the next tile
+            yield return new WaitForSeconds(0.5f); // adjust speed here
+            Debug.Log(playerInMovement);
+        }
+        playerInMovement = false;
+        Debug.Log(playerInMovement);
     }
 }
