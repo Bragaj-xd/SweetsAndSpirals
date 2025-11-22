@@ -151,34 +151,6 @@ public class GameManager : MonoBehaviour
 
         return newCard;
     }
-    /*
-    IEnumerator MovePlayerTileByTile(GameObject player, int start, int end)
-    {
-        isMoving = true;
-        for (int i = start; i <= end; i++)
-        {
-            Tile tile = floorManager.FindTileByID(i);
-            if (tile == null) yield break;
-
-            // Move player to this tile's marker
-            string markerName = redToMove ? "Red Position" : "Blue Position";
-            Transform marker = tile.transform.Find(markerName);
-
-            player.transform.position = marker.position;
-            player.GetComponent<PlayerStats>().currentPos = i;
-
-            Debug.Log($"Step on tile {i}");
-
-            // Wait before moving to the next tile
-            yield return new WaitForSeconds(0.5f); // adjust speed here
-            Debug.Log(isMoving);
-        }
-        isMoving = false;
-        Debug.Log(isMoving);
-    }
-    */
-
-    // helper to get correct marker for tile & player
     Transform GetMarkerForPlayer(Tile tile, GameObject player)
     {
         if (tile == null) return null;
