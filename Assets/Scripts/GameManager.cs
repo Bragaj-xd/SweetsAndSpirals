@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
 using System.Collections;
+using NUnit.Framework;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class GameManager : MonoBehaviour
     public DiceRoll diceRoll;
     public GameObject cardPrefab;
 
-    public bool playerInMovement;
+    private bool isMoving = false;
 
     public bool inputMenu;
 
@@ -115,131 +116,12 @@ public class GameManager : MonoBehaviour
 
     void FindTile(int currentPlayerPos)
     {
-        int targetTileID = currentPlayerPos + diceRoll.wheelValue;
-        Transform redMarker = null;
-        Transform blueMarker = null;
-        foreach (Tile t in floorManager.tiles)
-        {
-            if (t.tileID == targetTileID)
-            {
-                switch (t.tileFunction)
-                {
-                    case 0:
-                        if (redToMove)
-                        {
-                            redMarker = t.transform.Find("Red Position");
-                        }
-                        else
-                        {
-                            blueMarker = t.transform.Find("Blue Position");
-                        }
-                        break;
-                    case 1:
-                        Debug.Log("stepped on a ladder");
-                        foreach (GameObject l in floorManager.ladders)
-                        {
-                            if (l.GetComponent<Ladder>().startTile == targetTileID)
-                            {
-                                int newTargetID = l.GetComponent<Ladder>().endTile;
-                                foreach (Tile ts in floorManager.tiles)
-                                {
-                                    if (ts.tileID == newTargetID)
-                                    {
-                                        if (redToMove)
-                                        {
-                                            redMarker = ts.transform.Find("Red Position");
-                                        }
-                                            
-                                        else
-                                        {
-                                            blueMarker = ts.transform.Find("Blue Position");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    case 2:
-                        if (redToMove)
-                        {
-                            redMarker = t.transform.Find("Red Position");
-                        }
-                        else
-                        {
-                            blueMarker = t.transform.Find("Blue Position");
-                        }
-                        break;
-                    case 3:
-                        Debug.Log("stepped on a snake");
-                        foreach (GameObject s in floorManager.snakes)
-                        {
-                            if (s.GetComponent<Snake>().startTile == targetTileID)
-                            {
-                                int newTargetID = s.GetComponent<Snake>().endTile;
-                                foreach (Tile ts in floorManager.tiles)
-                                {
-                                    if (ts.tileID == newTargetID)
-                                    {
-                                        if (redToMove)
-                                        {
-                                            redMarker = ts.transform.Find("Red Position");
-                                        }
-                                            
-                                        else
-                                        {
-                                            blueMarker = ts.transform.Find("Blue Position");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    case 4:
-                        if (redToMove)
-                        {
-                            redMarker = t.transform.Find("Red Position");
-                        }
-                        else
-                        {
-                            blueMarker = t.transform.Find("Blue Position");
-                        }
-                        break;
-                }
-                if (redToMove)
-                {
-                    if (redMarker != null)
-                    {
-                        StartCoroutine(MovePlayerTileByTile(
-                            redPlayer,
-                            redPlayer.GetComponent<PlayerStats>().currentPos + 1,
-                            redMarker.GetComponentInParent<Tile>().tileID
-                        ));
+        int targetID = currentPlayerPos + diceRoll.wheelValue;
+        GameObject player = redToMove ? redPlayer : bluePlayer;
 
-                        //redPlayer.transform.position = redMarker.position;
-                        //redPlayer.GetComponent<PlayerStats>().currentPos = redMarker.GetComponentInParent<Tile>().tileID;
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"Tile {t.tileID} missing RedPos marker!");
-                    }
-                }
-                else
-                {
-                    if (blueMarker != null)
-                    {
-                        StartCoroutine(MovePlayerTileByTile(
-                            bluePlayer,
-                            bluePlayer.GetComponent<PlayerStats>().currentPos + 1,
-                            blueMarker.GetComponentInParent<Tile>().tileID
-                        ));
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"Tile {t.tileID} missing BluePos marker!");
-                    }
-                }
-                break;
-            }
+        if (!isMoving)
+        {
+            StartCoroutine(MovePlayerTileByTile(player, targetID));
         }
     }
 
@@ -269,10 +151,10 @@ public class GameManager : MonoBehaviour
 
         return newCard;
     }
-
+    /*
     IEnumerator MovePlayerTileByTile(GameObject player, int start, int end)
     {
-        playerInMovement = true;
+        isMoving = true;
         for (int i = start; i <= end; i++)
         {
             Tile tile = floorManager.FindTileByID(i);
@@ -289,9 +171,123 @@ public class GameManager : MonoBehaviour
 
             // Wait before moving to the next tile
             yield return new WaitForSeconds(0.5f); // adjust speed here
-            Debug.Log(playerInMovement);
+            Debug.Log(isMoving);
         }
-        playerInMovement = false;
-        Debug.Log(playerInMovement);
+        isMoving = false;
+        Debug.Log(isMoving);
     }
+    */
+
+    // helper to get correct marker for tile & player
+    Transform GetMarkerForPlayer(Tile tile, GameObject player)
+    {
+        if (tile == null) return null;
+        bool movingRed = (player == redPlayer);
+        return movingRed ? tile.transform.Find("Red Position") : tile.transform.Find("Blue Position");
+    }
+
+    // main coroutine: moves player tile-by-tile from currentPos -> destinationID (inclusive)
+    IEnumerator MovePlayerTileByTile(GameObject player, int destinationID)
+    {
+        isMoving = true;
+
+        PlayerStats stats = player.GetComponent<PlayerStats>();
+        if (stats == null)
+        {
+            Debug.LogError("PlayerStats missing on player!");
+            isMoving = false;
+            yield break;
+        }
+
+        int start = stats.currentPos;
+        if (start == destinationID)
+        {
+            // already there - still check tile function (in case of immediate ladder/snake)
+            yield return StartCoroutine(HandleTileEffects(player, destinationID));
+            isMoving = false;
+            yield break;
+        }
+
+        int step = destinationID > start ? 1 : -1;
+
+        for (int id = start + step; ; id += step)
+        {
+            Tile tile = floorManager.FindTileByID(id);
+            if (tile == null)
+            {
+                Debug.LogWarning($"MovePlayerTileByTile: no tile with ID {id}");
+                break;
+            }
+
+            Transform marker = GetMarkerForPlayer(tile, player);
+            if (marker == null)
+            {
+                Debug.LogWarning($"Tile {tile.tileID} missing marker for {player.name}");
+            }
+            else
+            {
+                player.transform.position = marker.position;
+            }
+
+            stats.currentPos = id;
+            Debug.Log($"{player.name} moved to {id}");
+
+            // WAIT between steps (tweak delay as needed)
+            yield return new WaitForSeconds(0.25f);
+
+            if (id == destinationID) break;
+        }
+
+        // After arrival, handle tile effects (ladders/snakes)
+        yield return StartCoroutine(HandleTileEffects(player, destinationID));
+
+        isMoving = false;
+    }
+
+    // check tileFunction and if snake/ladder move to endpoint (tile-by-tile)
+    IEnumerator HandleTileEffects(GameObject player, int tileID)
+    {
+        Tile tile = floorManager.FindTileByID(tileID);
+        if (tile == null) yield break;
+
+        switch (tile.tileFunction)
+        {
+            case 1: // ladder start
+                Debug.Log($"{player.name} stepped on a ladder at {tileID}");
+                foreach (GameObject l in floorManager.ladders)
+                {
+                    Ladder ladder = l.GetComponent<Ladder>();
+                    if (ladder != null && ladder.startTile == tileID)
+                    {
+                        int endID = ladder.endTile;
+                        // small pause before climbing
+                        yield return new WaitForSeconds(0.2f);
+                        yield return StartCoroutine(MovePlayerTileByTile(player, endID));
+                        break; // assume only one ladder per start
+                    }
+                }
+                break;
+
+            case 3: // snake start
+                Debug.Log($"{player.name} stepped on a snake at {tileID}");
+                foreach (GameObject s in floorManager.snakes)
+                {
+                    Snake snake = s.GetComponent<Snake>();
+                    if (snake != null && snake.startTile == tileID)
+                    {
+                        int endID = snake.endTile;
+                        // small pause before sliding
+                        yield return new WaitForSeconds(0.2f);
+                        yield return StartCoroutine(MovePlayerTileByTile(player, endID));
+                        break; // assume only one snake per start
+                    }
+                }
+                break;
+
+            // other tileFunctions (0,2,4) can be handled here if needed
+            default:
+                yield break;
+        }
+    }
+
 }
