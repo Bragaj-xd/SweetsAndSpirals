@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine.InputSystem;
 using System.Collections;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
@@ -234,7 +235,9 @@ public class GameManager : MonoBehaviour
                         int endID = ladder.endTile;
                         // small pause before climbing
                         yield return new WaitForSeconds(0.2f);
-                        yield return StartCoroutine(MovePlayerTileByTile(player, endID));
+                        yield return StartCoroutine(MoveAlongSegments(player, ladder.segmentPositions));
+
+                        player.GetComponent<PlayerStats>().currentPos = endID;
                         break; // assume only one ladder per start
                     }
                 }
@@ -250,7 +253,9 @@ public class GameManager : MonoBehaviour
                         int endID = snake.endTile;
                         // small pause before sliding
                         yield return new WaitForSeconds(0.2f);
-                        yield return StartCoroutine(MovePlayerTileByTile(player, endID));
+                        yield return StartCoroutine(MoveAlongSegments(player, snake.segmentPositions));
+
+                        player.GetComponent<PlayerStats>().currentPos = endID;
                         break; // assume only one snake per start
                     }
                 }
@@ -261,5 +266,14 @@ public class GameManager : MonoBehaviour
                 yield break;
         }
     }
+    IEnumerator MoveAlongSegments(GameObject player, List<Transform> segments)
+    {
+        foreach (Transform seg in segments)
+        {
+            player.transform.position = seg.position;
 
+            // small delay between segment steps
+            yield return new WaitForSeconds(0.15f);
+        }
+    }
 }

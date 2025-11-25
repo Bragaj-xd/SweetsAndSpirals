@@ -6,6 +6,8 @@ public class FloorManager : MonoBehaviour
 {
     public GameObject tilePrefab;
     public GameObject ladderPrefab;
+    public GameObject ladder2Prefab;
+    public GameObject ladder3Prefab;
     public GameObject snakePrefab;
     public int width = 10;
     public int height = 10;
@@ -113,14 +115,14 @@ public class FloorManager : MonoBehaviour
     void generateSaL()
     {
         List<int> SaLEndTiles = new List<int> {8, 24, 23, 9, 22, 30, 21, 12, 18, 19, 11, 20};
-        //List<int> SnakesEndTiles = new List<int> {-8, -24, -23, -9, -22, -30, -21, -12, -18, -19, -11, -20};
         int SalCount = Random.Range(5,15);
         int nextSaLID;
         int randomSaLID;
         int previousSaLID = 0;
         int isLadder;
         GameObject SaLPrefab;
-        Vector3 pos = new Vector3(0,0,0);
+        Vector3 posStart = new Vector3(0,0,0);
+        Vector3 posEnd = new Vector3(0,0,0);
         for(int i = 0; i < SalCount + 1; i++)
         {
             randomSaLID = Random.Range(5, 10);
@@ -145,6 +147,7 @@ public class FloorManager : MonoBehaviour
             {
                 SaLPrefab = snakePrefab;
                 int randomTileEnd = Random.Range(0,12);
+                
                 endTile = FindTileByID(Mathf.Clamp(nextSaLID - SaLEndTiles[randomTileEnd], 0 , tiles.Length - 10));
 
                 Debug.Log("snake " + startTile + " " + endTile);
@@ -152,7 +155,7 @@ public class FloorManager : MonoBehaviour
                 {
                     startTile.tileFunction = 3;
                     endTile.tileFunction = 4;
-                    pos = startTile.GetComponentInChildren<SnakePos>().transform.position;
+                    posStart = startTile.GetComponentInChildren<SnakePos>().transform.position;
                 }
                     
                 
@@ -168,15 +171,13 @@ public class FloorManager : MonoBehaviour
                 {
                     startTile.tileFunction = 1;
                     endTile.tileFunction = 2;
-                    pos = startTile.GetComponentInChildren<LadderPos>().transform.position;
                 }
                     
             }
             
-            previousSaLID = nextSaLID;
-            GameObject newSaL = Instantiate(SaLPrefab, pos, Quaternion.identity, transform);
             if(isLadder == 0)
             {
+                GameObject newSaL = BuildSnake(startTile,endTile);
                 snakes.Add(newSaL);
                 Snake snakeComp = newSaL.GetComponent<Snake>();
                 if (snakeComp != null)
@@ -187,6 +188,7 @@ public class FloorManager : MonoBehaviour
             }
             else
             {
+                GameObject newSaL = BuildLadder(startTile,endTile);
                 ladders.Add(newSaL);
                 Ladder ladderComp = newSaL.GetComponent<Ladder>();
                 if (ladderComp != null)
@@ -195,22 +197,73 @@ public class FloorManager : MonoBehaviour
                     ladderComp.endTile = endTile.tileID;
                 }
             }
-            // compute direct direction from start to end
-            Vector3 targetDirection = endTile.transform.position - startTile.transform.position;
-            if (targetDirection.sqrMagnitude <= Mathf.Epsilon) continue;
-
-            // use LookRotation to face the target
-            Quaternion look = Quaternion.LookRotation(targetDirection.normalized);
-
-            // APPLY A YAW OFFSET if your ladder model's forward axis is rotated.
-            // The common fix when things are off by -90° yaw is to multiply by this:
-            Quaternion yawOffset = Quaternion.Euler(0f, -90f, 0f);
-            // If it's off by +90°, change to Quaternion.Euler(0f, 90f, 0f).
-
-            newSaL.transform.rotation = look * yawOffset;
-        
+            previousSaLID = nextSaLID;
         }
     }
 
+    GameObject BuildLadder(Tile startTile, Tile endTile)
+    {
+        Vector3 startPos = startTile.GetComponentInChildren<LadderPos>().transform.position;
+        Vector3 endPos = endTile.GetComponentInChildren<LadderPos>().transform.position;
+
+        Vector3 dir = (endPos - startPos).normalized;
+        float totalDistance = Vector3.Distance(startPos, endPos);
+
+        float segmentLength = 1f;  // or measure from prefab bounds
+        int segmentCount = Mathf.CeilToInt(totalDistance / segmentLength);
+
+        GameObject ladderRoot = new GameObject("Ladder"); 
+        ladderRoot.transform.parent = this.transform;
+
+        for (int i = 0; i < segmentCount; i++)
+        {
+            Vector3 pos = startPos + dir * (i * segmentLength);
+            GameObject seg = Instantiate(ladderPrefab, pos, Quaternion.LookRotation(dir), ladderRoot.transform);
+        }
+
+        Ladder ladderComp = ladderRoot.AddComponent<Ladder>();
+        ladderComp.startTile = startTile.tileID;
+        ladderComp.endTile   = endTile.tileID;
+
+        return ladderRoot;
+    }
+    GameObject BuildSnake(Tile startTile, Tile endTile)
+    {
+        Vector3 startPos = startTile.GetComponentInChildren<SnakePos>().transform.position;
+        Vector3 endPos = endTile.GetComponentInChildren<SnakePos>().transform.position;
+
+        // Direction the snake segments will follow
+        Vector3 dir = (endPos - startPos).normalized;
+        float totalDistance = Vector3.Distance(startPos, endPos);
+
+        // Length of a snake segment (adjust to match your model)
+        float segmentLength = 1.0f;
+
+        int segmentCount = Mathf.CeilToInt(totalDistance / segmentLength);
+
+        // Container object for the whole snake
+        GameObject snakeRoot = new GameObject("Snake");
+        snakeRoot.transform.parent = this.transform;
+
+        for (int i = 0; i < segmentCount; i++)
+        {
+            Vector3 pos = startPos + dir * (i * segmentLength);
+
+            // Spawn one snake piece
+            GameObject segment = Instantiate(
+                snakePrefab, 
+                pos, 
+                Quaternion.LookRotation(dir), 
+                snakeRoot.transform
+            );
+        }
+
+        // Add script to root
+        Snake snakeComp = snakeRoot.AddComponent<Snake>();
+        snakeComp.startTile = startTile.tileID;
+        snakeComp.endTile   = endTile.tileID;
+
+        return snakeRoot;
+    }
     
 }

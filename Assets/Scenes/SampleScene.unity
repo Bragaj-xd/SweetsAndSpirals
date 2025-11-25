@@ -857,6 +857,67 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 01566ff5bf91a774db8a00a2495db606, type: 3}
+--- !u!1001 &144798446
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1487118692208556441, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_Name
+      value: Ladder
+      objectReference: {fileID: 0}
+    - target: {fileID: 1487118692208556441, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299261602410488611, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.9219034
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299261602410488611, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.12750149
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299261602410488611, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.9913917
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299261602410488611, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299261602410488611, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299261602410488611, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299261602410488611, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299261602410488611, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299261602410488611, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299261602410488611, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
 --- !u!1001 &147562060
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6002,6 +6063,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FloorManager
   tilePrefab: {fileID: 2727332041335744800, guid: c1d47082c44075d48964f3f1b78326a4, type: 3}
   ladderPrefab: {fileID: 1487118692208556441, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+  ladder2Prefab: {fileID: 1279605907384905954, guid: b43210b13bb541746937614d2c85ee06, type: 3}
+  ladder3Prefab: {fileID: 5847887330350254178, guid: 4fd1f824458110145983aa43f3dfeacb, type: 3}
   snakePrefab: {fileID: 1487118692208556441, guid: 66691615dc1e7924c938b5d1c6e4b26b, type: 3}
   width: 10
   height: 10
@@ -10126,3 +10189,4 @@ SceneRoots:
   - {fileID: 743556262}
   - {fileID: 271791428}
   - {fileID: 1643209181}
+  - {fileID: 144798446}
