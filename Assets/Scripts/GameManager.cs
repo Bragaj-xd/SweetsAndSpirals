@@ -11,12 +11,17 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI winScreenText;
     public FloorManager floorManager;
     public int playerToMove = 0;
-    public bool redToMove = true;
-    public GameObject redPlayer;
-    public GameObject bluePlayer;
+    public List<GameObject> players;
     public DiceRoll diceRoll;
     public GameObject cardPrefab;
-
+    
+    public List<string> playerPositionNames = new List<string>()
+            {
+                "Red Position",
+                "Blue Position",
+                "Green Position",
+                "Yellow Position"
+            };
     private bool isMoving = false;
 
     public bool inputMenu;
@@ -25,6 +30,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+
+        
         // Safety checks
         if (floorManager == null)
         {
@@ -32,7 +39,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (redPlayer == null || bluePlayer == null)
+        if (players[0] == null || players[1] == null)
         {
             Debug.LogError("GameManager: Red or Blue player not assigned!");
             return;
@@ -46,19 +53,32 @@ public class GameManager : MonoBehaviour
                 // Find markers
                 Transform redMarker = t.transform.Find("Red Position");
                 Transform blueMarker = t.transform.Find("Blue Position");
+                Transform greenMarker = t.transform.Find("Green Position");
+                Transform yellowMarker = t.transform.Find("Yellow Position");
+
+                
 
                 if (redMarker != null)
-                    redPlayer.transform.position = redMarker.position;
+                    players[0].transform.position = redMarker.position;
                 else
                     Debug.LogWarning($"Tile {t.tileID} missing RedPos marker!");
 
                 if (blueMarker != null)
-                    bluePlayer.transform.position = blueMarker.position;
+                    players[1].transform.position = blueMarker.position;
                 else
                     Debug.LogWarning($"Tile {t.tileID} missing BluePos marker!");
-
-                redPlayer.GetComponent<PlayerStats>().currentPos = 0;
-                bluePlayer.GetComponent<PlayerStats>().currentPos = 0;
+                if (greenMarker != null)
+                    players[2].transform.position = greenMarker.position;
+                else
+                    Debug.LogWarning($"Tile {t.tileID} missing BluePos marker!");
+                if (yellowMarker != null)
+                    players[3].transform.position = yellowMarker.position;
+                else
+                    Debug.LogWarning($"Tile {t.tileID} missing BluePos marker!");
+                players[0].GetComponent<PlayerStats>().currentPos = 0;
+                players[1].GetComponent<PlayerStats>().currentPos = 0;
+                players[2].GetComponent<PlayerStats>().currentPos = 0;
+                players[3].GetComponent<PlayerStats>().currentPos = 0;
 
                 break;
             }
@@ -80,45 +100,50 @@ public class GameManager : MonoBehaviour
         if (diceRoll.wheelSpun > lastWheelNum)
         {
             // Increment move counter
-            playerToMove++;
+            //playerToMove++;
+            playerToMove = (playerToMove + 1) % players.Count;
+            Debug.Log(playerToMove);
             lastWheelNum = diceRoll.wheelSpun;
-            
-            // Decide who moves this turn
-            if (playerToMove % 2 == 0)
+
+            GameObject player = players[playerToMove];
+            if (diceRoll.wheelValue != 3)
             {
-                redToMove = true;
-                if (diceRoll.wheelValue <= 6)
-                    UpdatePlayerPosition(redPlayer); // Move red player once
-                else
-                    AddChanceCard(redPlayer);
-            }
-            else
-            {
-                redToMove = false;
-                if (diceRoll.wheelValue <= 6)
-                    UpdatePlayerPosition(bluePlayer); // Move blue player once
-                else
-                    AddChanceCard(bluePlayer);
-            }
+                Debug.Log(player);
+                UpdatePlayerPosition(player);
+            }      
+            if( diceRoll.wheelValue == 3)
+                AddChanceCard(player);
         }
-        if (redPlayer.GetComponent<PlayerStats>().currentPos >= 99)
+        if (players[0].GetComponent<PlayerStats>().currentPos >= 99)
         {
             Debug.Log("red player won");
             winScreenText.gameObject.SetActive(true);
             winScreenText.text = "Red Player Won";
         }
-        if(bluePlayer.GetComponent<PlayerStats>().currentPos >= 99)
+        if(players[1].GetComponent<PlayerStats>().currentPos >= 99)
         {
             Debug.Log("blue player won");
             winScreenText.gameObject.SetActive(true);   
             winScreenText.text = "Blue Player Won";
+        }
+        if (players[2].GetComponent<PlayerStats>().currentPos >= 99)
+        {
+            Debug.Log("Green player won");
+            winScreenText.gameObject.SetActive(true);
+            winScreenText.text = "Green Player Won";
+        }
+        if(players[3].GetComponent<PlayerStats>().currentPos >= 99)
+        {
+            Debug.Log("Yellow player won");
+            winScreenText.gameObject.SetActive(true);   
+            winScreenText.text = "Yellow Player Won";
         }
     }
 
     void FindTile(int currentPlayerPos)
     {
         int targetID = currentPlayerPos + diceRoll.wheelValue;
-        GameObject player = redToMove ? redPlayer : bluePlayer;
+        GameObject player = players[playerToMove];
 
         if (!isMoving)
         {
@@ -154,9 +179,26 @@ public class GameManager : MonoBehaviour
     }
     Transform GetMarkerForPlayer(Tile tile, GameObject player)
     {
-        if (tile == null) return null;
-        bool movingRed = (player == redPlayer);
-        return movingRed ? tile.transform.Find("Red Position") : tile.transform.Find("Blue Position");
+        if (tile == null || player == null)
+        {
+            Debug.Log("tile or player is null");
+            return null;
+        }
+            
+
+        int index = players.IndexOf(player);
+        Debug.Log("index: " + index);
+        if (index < 0 || index >= playerPositionNames.Count)
+        {
+            Debug.Log(playerPositionNames.Count);
+            return null;
+        }
+        
+
+        string posName = playerPositionNames[index];
+        Debug.Log("posname " + posName);
+        return tile.transform.Find(posName);
+        
     }
 
     // main coroutine: moves player tile-by-tile from currentPos -> destinationID (inclusive)
@@ -191,8 +233,9 @@ public class GameManager : MonoBehaviour
                 Debug.LogWarning($"MovePlayerTileByTile: no tile with ID {id}");
                 break;
             }
-
+            Debug.Log(player);
             Transform marker = GetMarkerForPlayer(tile, player);
+            Debug.Log(marker);
             if (marker == null)
             {
                 Debug.LogWarning($"Tile {tile.tileID} missing marker for {player.name}");
@@ -203,7 +246,7 @@ public class GameManager : MonoBehaviour
             }
 
             stats.currentPos = id;
-            Debug.Log($"{player.name} moved to {id}");
+            //Debug.Log($"{player.name} moved to {id}");
 
             // WAIT between steps (tweak delay as needed)
             yield return new WaitForSeconds(0.25f);
