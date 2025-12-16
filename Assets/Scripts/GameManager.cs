@@ -7,6 +7,56 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+/*
+    <----------------------------------------------------------------------------------------------------------------------->
+        TO DO LIST:
+    ---------------------
+            Fixes
+        -------------------
+                - fix player position after moving from SaL
+
+        -------------------
+            Cards
+        -------------------
+                - add cards
+                - add card bundle
+                - add card shuffling
+
+        -------------------
+            SaL spawning
+        -------------------
+                - 3 locked states from start
+
+                - adding SaL by player
+                    - 3 lengths for Sal
+                    - spawn logic
+                        - hover SaL on desk
+                        - rotate with mouse wheel
+                        - place to nearest tiles
+
+                - add jam
+                - add caramel
+        -------------------
+            UI
+        -------------------
+                - start screen
+                - updated UI (graphics shit)
+        -------------------
+            Graphics
+        -------------------
+                - snakes
+                - jam
+                - caramel
+        -------------------
+            Multiplayer
+        -------------------
+                - redo this shit to multiplayer version (gg we are cooked)
+                - keep both versions local/online multiplayer
+
+
+    <----------------------------------------------------------------------------------------------------------------------->
+*/
+
 public class GameManager : MonoBehaviour
 {
     public Button rollTheDice;
