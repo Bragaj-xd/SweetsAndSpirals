@@ -5,15 +5,19 @@ using UnityEngine.InputSystem;
 using System.Collections;
 using NUnit.Framework;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public TextMeshProUGUI winScreenText;
+    public Button rollTheDice;
     public FloorManager floorManager;
     public int playerToMove = 0;
+    public GameObject activePlayer;
     public List<GameObject> players;
     public DiceRoll diceRoll;
     public GameObject cardPrefab;
+    public bool rolledThree;
+    
     
     public List<string> playerPositionNames = new List<string>()
             {
@@ -83,10 +87,7 @@ public class GameManager : MonoBehaviour
                 break;
             }
         }
-        if(winScreenText != null)
-        {
-            winScreenText.gameObject.SetActive(false);
-        }
+        
     }
 
     public void OnMenu(InputAction.CallbackContext context) => inputMenu = context.ReadValueAsButton();
@@ -99,47 +100,29 @@ public class GameManager : MonoBehaviour
         // Check if dice was just spun
         if (diceRoll.wheelSpun > lastWheelNum)
         {
+            rollTheDice.interactable = false;
+
             // Increment move counter
-            //playerToMove++;
-            playerToMove = (playerToMove + 1) % players.Count;
-            Debug.Log(playerToMove);
+            
             lastWheelNum = diceRoll.wheelSpun;
 
-            GameObject player = players[playerToMove];
+            activePlayer = players[playerToMove];
             if (diceRoll.wheelValue != 3)
             {
-                Debug.Log(player);
-                UpdatePlayerPosition(player);
+                UpdatePlayerPosition(activePlayer);
+            }
+            if(diceRoll.wheelValue == 3)
+            {
+                rolledThree = true;   
             }      
-            if( diceRoll.wheelValue == 3)
-                AddChanceCard(player);
-        }
-        if (players[0].GetComponent<PlayerStats>().currentPos >= 99)
-        {
-            Debug.Log("red player won");
-            winScreenText.gameObject.SetActive(true);
-            winScreenText.text = "Red Player Won";
-        }
-        if(players[1].GetComponent<PlayerStats>().currentPos >= 99)
-        {
-            Debug.Log("blue player won");
-            winScreenText.gameObject.SetActive(true);   
-            winScreenText.text = "Blue Player Won";
-        }
-        if (players[2].GetComponent<PlayerStats>().currentPos >= 99)
-        {
-            Debug.Log("Green player won");
-            winScreenText.gameObject.SetActive(true);
-            winScreenText.text = "Green Player Won";
-        }
-        if(players[3].GetComponent<PlayerStats>().currentPos >= 99)
-        {
-            Debug.Log("Yellow player won");
-            winScreenText.gameObject.SetActive(true);   
-            winScreenText.text = "Yellow Player Won";
+            
+                
+                
+                
+                //AddChanceCard(player);
+            
         }
     }
-
     void FindTile(int currentPlayerPos)
     {
         int targetID = currentPlayerPos + diceRoll.wheelValue;
@@ -151,16 +134,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void UpdatePlayerPosition(GameObject player)
+    public void UpdatePlayerPosition(GameObject player)
     {
         FindTile(player.GetComponent<PlayerStats>().currentPos);
     }
-    void AddChanceCard(GameObject player)
+    public void AddChanceCard(GameObject player)
     {
         GameObject newCard = SpawnCard();
 
         player.GetComponent<PlayerStats>().cards.Add(newCard);
-
+        playerToMove = (playerToMove + 1) % players.Count;
+        rollTheDice.interactable = true;
         Debug.Log($"Added card {newCard.name} to {player.name}'s cards!");
     }
     
@@ -251,12 +235,18 @@ public class GameManager : MonoBehaviour
             // WAIT between steps (tweak delay as needed)
             yield return new WaitForSeconds(0.25f);
 
-            if (id == destinationID) break;
+            if (id == destinationID)
+            {
+                playerToMove = (playerToMove + 1) % players.Count;
+                
+                break;
+            }
+            
         }
 
         // After arrival, handle tile effects (ladders/snakes)
         yield return StartCoroutine(HandleTileEffects(player, destinationID));
-
+        rollTheDice.interactable = true;
         isMoving = false;
     }
 
@@ -281,6 +271,8 @@ public class GameManager : MonoBehaviour
                         yield return StartCoroutine(MoveAlongSegments(player, ladder.segmentPositions));
 
                         player.GetComponent<PlayerStats>().currentPos = endID;
+                        playerToMove = (playerToMove + 1) % players.Count;
+                        //rollTheDice.interactable = true;
                         break; // assume only one ladder per start
                     }
                 }
@@ -299,6 +291,8 @@ public class GameManager : MonoBehaviour
                         yield return StartCoroutine(MoveAlongSegments(player, snake.segmentPositions));
 
                         player.GetComponent<PlayerStats>().currentPos = endID;
+                        playerToMove = (playerToMove + 1) % players.Count;
+                        //rollTheDice.interactable = true;
                         break; // assume only one snake per start
                     }
                 }
@@ -319,4 +313,6 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(0.15f);
         }
     }
+
 }
+

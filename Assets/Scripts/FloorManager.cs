@@ -14,6 +14,7 @@ public class FloorManager : MonoBehaviour
     public float tileSize = 2f;
 
     [HideInInspector] public Tile[,] tiles;
+    public Tile finishTile;
     public List<GameObject> ladders = new List<GameObject>();
     public List<GameObject> snakes = new List<GameObject>();
 
@@ -64,6 +65,11 @@ public class FloorManager : MonoBehaviour
 
         // Assign unique ID
         tile.tileID = idCounter;
+        if(tile.tileID == (width * height) - 1)
+        {
+            finishTile = tile;
+            Debug.Log(finishTile);
+        }
         idCounter++;
     }
 

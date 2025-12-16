@@ -9,13 +9,13 @@ public class DiceRoll : MonoBehaviour
     public void SpinTheWheel()
     {
 
-        wheelSpun++;
+        
         Debug.Log(wheelSpun);
         wheelValue = Random.Range(1, 7);
         //wheelValue = 1;     //debug
         Debug.Log("Rolled: " + wheelValue);
         wheelSpinText.text = (wheelValue.ToString());
-        
+        wheelSpun++;
         
     }
 
