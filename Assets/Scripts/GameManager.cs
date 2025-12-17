@@ -27,7 +27,7 @@ using UnityEngine.UI;
         -------------------
                 - 3 locked states from start
 
-                - adding SaL by player
+    - prio          - adding SaL by player
                     - 3 lengths for Sal
                     - spawn logic
                         - hover SaL on desk
@@ -36,6 +36,8 @@ using UnityEngine.UI;
 
                 - add jam
                 - add caramel
+                - add chance cards spawns
+                
         -------------------
             UI
         -------------------
@@ -78,14 +80,11 @@ public class GameManager : MonoBehaviour
             };
     private bool isMoving = false;
 
-    public bool inputMenu;
 
     private int lastWheelNum = 0;
 
     void Start()
     {
-
-        
         // Safety checks
         if (floorManager == null)
         {
@@ -140,13 +139,8 @@ public class GameManager : MonoBehaviour
         
     }
 
-    public void OnMenu(InputAction.CallbackContext context) => inputMenu = context.ReadValueAsButton();
     void Update()
     {
-        if(inputMenu)
-        {
-            Application.Quit();
-        }
         // Check if dice was just spun
         if (diceRoll.wheelSpun > lastWheelNum)
         {
@@ -165,12 +159,6 @@ public class GameManager : MonoBehaviour
             {
                 rolledThree = true;   
             }      
-            
-                
-                
-                
-                //AddChanceCard(player);
-            
         }
     }
     void FindTile(int currentPlayerPos)
@@ -207,7 +195,7 @@ public class GameManager : MonoBehaviour
         Vector3 pos = new Vector3(0f, 0f);
         GameObject newCard = Instantiate(cardPrefab, pos, Quaternion.identity, transform);
         newCard.name = "Card";
-        newCard.GetComponent<CardStats>().cardId = PickRandomCard();
+        newCard.GetComponent<CardStats>().cardId = 1;//PickRandomCard();
 
         return newCard;
     }

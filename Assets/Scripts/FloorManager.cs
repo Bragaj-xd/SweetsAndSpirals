@@ -21,7 +21,7 @@ public class FloorManager : MonoBehaviour
     void Awake()
     {
         GenerateFloor();
-        generateSaL();
+        //generateSaL();
     }
 
     void GenerateFloor()

@@ -121,6 +121,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2758381390278695863}
   - component: {fileID: -8509981636928148259}
+  - component: {fileID: 3647175325378266580}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -157,3 +158,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   currentPos: 0
+  cards: []
+--- !u!114 &3647175325378266580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2483392702695036206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ba83f1c7b8993b479d570d32901069f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerActions
+  ladderPrefab: {fileID: 1487118692208556441, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
