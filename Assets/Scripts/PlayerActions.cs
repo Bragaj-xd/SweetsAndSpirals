@@ -10,18 +10,14 @@ public class PlayerActions : MonoBehaviour
     public FloorManager floorManager;
     private GameObject rollThree;
     public bool inputMenu;
-    public bool inputPlaceSaL;
     public bool moveLadder;
-    public bool inputLeftMouseButton;
     PlayerStats playerStats;
     public GameObject ladderPrefab;
     Vector3 dir = new Vector3(0,0,1);
     GameObject ladderPreview;
     public GameObject player;
     public GameObject startTile;
-    public GameObject defautlTile;
     public int startTileID;
-    public int endTileID;
     Ladder ladderPreviewScript;
 
     void Start()
@@ -95,28 +91,6 @@ public class PlayerActions : MonoBehaviour
 
     void MoveLadder()
     {
-        if (playerStats.cards == null) return;
-
-        bool hasLadderCard = false;
-
-        foreach (GameObject card in playerStats.cards)
-        {
-            if (card.GetComponent<CardStats>().cardId == 1)
-            {
-                hasLadderCard = true;
-                break;
-            }
-        }
-
-        if (!hasLadderCard)
-        {
-            if (ladderPreview != null)
-            {
-                Destroy(ladderPreview);
-                ladderPreview = null;
-            }
-            return;
-        }
 
         if (!GetMouseWorldPoint(out Vector3 mouseWorldPos))
             return;
@@ -139,29 +113,6 @@ public class PlayerActions : MonoBehaviour
         
     }
 
-/*
-    bool GetMouseWorldPoint(out Vector3 worldPoint)
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
-        {
-            worldPoint = hit.point;
-            if(hit.transform.parent.gameObject.GetComponent<Tile>() != null)
-            {
-                startTile = hit.transform.parent.gameObject;
-            }
-
-            
-            startTileID = startTile.GetComponent<Tile>().tileID;
-            
-            return true;
-        }
-
-        worldPoint = Vector3.zero;
-        return false;
-    }
-*/
     bool GetMouseWorldPoint(out Vector3 worldPoint)
     {
         worldPoint = Vector3.zero;
@@ -202,7 +153,13 @@ public class PlayerActions : MonoBehaviour
             gameManager.AddChanceCard(player);
             gameManager.rolledThree = false;
             rollThree.SetActive(false);
-            moveLadder = true;
+            foreach (GameObject card in playerStats.cards)
+            {
+                if (card.GetComponent<CardStats>().cardId == 1)
+                {
+                    moveLadder = true;
+                }
+            }
         }
     }
 }
