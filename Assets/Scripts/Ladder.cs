@@ -7,15 +7,36 @@ public class Ladder : MonoBehaviour
     public int endTile;
     public List<Transform> segmentPositions = new List<Transform>();
 
-    void Awake()
+    void Start()
     {
-        // automatically collect all "pos" transforms under this ladder
-        segmentPositions.Clear();
-        var poses = GetComponentsInChildren<Transform>();
-        foreach (var t in poses)
+        UpdateEndTile();
+    }
+
+    public void UpdateEndTile()
+    {
+        if (TryGetEndTile(out Tile tile))
         {
-            if (t.name == "pos")
-                segmentPositions.Add(t);
+            endTile = tile.tileID;
         }
+    }
+
+    bool TryGetEndTile(out Tile endTile)
+    {
+        endTile = null;
+
+        if (segmentPositions.Count == 0)
+            return false;
+
+        Transform lastSegment = segmentPositions[^1];
+
+        Ray ray = new Ray(lastSegment.position + Vector3.up * 0.2f, Vector3.down);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 2f))
+        {
+            endTile = hit.transform.GetComponentInParent<Tile>();
+            return endTile != null;
+        }
+
+        return false;
     }
 }

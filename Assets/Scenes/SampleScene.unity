@@ -380,6 +380,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 57931742}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LeftMouseButton
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PlayerActions, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1646515550839536100, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -466,6 +486,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
   m_PrefabInstance: {fileID: 57931740}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &57931742 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3647175325378266580, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+  m_PrefabInstance: {fileID: 57931740}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 57931741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ba83f1c7b8993b479d570d32901069f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerActions
 --- !u!1001 &65286663
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3051,6 +3082,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
   m_PrefabInstance: {fileID: 1814474929}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &557831457 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3647175325378266580, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+  m_PrefabInstance: {fileID: 1814474929}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 557831456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ba83f1c7b8993b479d570d32901069f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerActions
 --- !u!4 &564989062 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 768885918038032786, guid: c1d47082c44075d48964f3f1b78326a4, type: 3}
@@ -3853,6 +3895,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
   m_PrefabInstance: {fileID: 7148789666552518120}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &703699614 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3647175325378266580, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+  m_PrefabInstance: {fileID: 7148789666552518120}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 703699613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ba83f1c7b8993b479d570d32901069f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerActions
 --- !u!4 &712537572 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 768885918038032786, guid: c1d47082c44075d48964f3f1b78326a4, type: 3}
@@ -5135,7 +5188,7 @@ GameObject:
   - component: {fileID: 933672109}
   m_Layer: 0
   m_Name: UIManager
-  m_TagString: Untagged
+  m_TagString: UIManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5734,7 +5787,7 @@ GameObject:
   - component: {fileID: 1019989722}
   m_Layer: 5
   m_Name: RollThree
-  m_TagString: Untagged
+  m_TagString: RollThree
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6281,11 +6334,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1113944630}
   - component: {fileID: 1113944631}
-  - component: {fileID: 1113944632}
   - component: {fileID: 1113944633}
   m_Layer: 0
   m_Name: GameManager
-  m_TagString: Untagged
+  m_TagString: GameManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6334,53 +6386,6 @@ MonoBehaviour:
   - Blue Position
   - Green Position
   - Yellow Position
-  inputMenu: 0
---- !u!114 &1113944632
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1113944629}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
-  m_Actions: {fileID: -944628639613478452, guid: 50d52dfe23396364e88572a10d01899a, type: 3}
-  m_NotificationBehavior: 2
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents:
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1113944631}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: OnMenu
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: a497297e-e891-4411-b32d-e9e1115b62e8
-    m_ActionName: 'EndGame/Quit Game[/Keyboard/escape]'
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: EndGame
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!114 &1113944633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6699,7 +6704,7 @@ GameObject:
   - component: {fileID: 1168863199}
   m_Layer: 0
   m_Name: FloorManager
-  m_TagString: Untagged
+  m_TagString: FloorManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7341,6 +7346,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1289879204}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LeftMouseButton
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PlayerActions, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1646515550839536100, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -7427,6 +7452,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
   m_PrefabInstance: {fileID: 1289879202}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1289879204 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3647175325378266580, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+  m_PrefabInstance: {fileID: 1289879202}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1289879203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ba83f1c7b8993b479d570d32901069f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerActions
 --- !u!1001 &1317813154
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8130,8 +8166,44 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 933672109}
-        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+      - m_Target: {fileID: 703699614}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: PickCard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 557831457}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: PickCard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 57931742}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: PickCard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1289879204}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
         m_MethodName: PickCard
         m_Mode: 1
         m_Arguments:
@@ -8564,8 +8636,44 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 933672109}
-        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+      - m_Target: {fileID: 703699614}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: MoveThree
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 557831457}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: MoveThree
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 57931742}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: MoveThree
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1289879204}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
         m_MethodName: MoveThree
         m_Mode: 1
         m_Arguments:
@@ -9289,6 +9397,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 557831457}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LeftMouseButton
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PlayerActions, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 2178326757565765737, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_Name
       value: Hrac 2 - vizual
@@ -11138,6 +11266,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_DefaultActionMap
+      value: d6ff91ea-71ed-4e2d-9984-d1be3cc5998e
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 703699614}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LeftMouseButton
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PlayerActions, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1646515550839536100, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

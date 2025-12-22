@@ -25,7 +25,7 @@ using UnityEngine.UI;
         -------------------
             SaL spawning
         -------------------
-                - 3 locked states from start
+                - 5 locked states from start
 
     - prio          - adding SaL by player
                     - 3 lengths for Sal
@@ -292,6 +292,7 @@ public class GameManager : MonoBehaviour
     IEnumerator HandleTileEffects(GameObject player, int tileID)
     {
         Tile tile = floorManager.FindTileByID(tileID);
+        Debug.Log(tile.tileFunction);
         if (tile == null) yield break;
 
         switch (tile.tileFunction)

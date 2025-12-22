@@ -122,6 +122,7 @@ GameObject:
   - component: {fileID: 2758381390278695863}
   - component: {fileID: -8509981636928148259}
   - component: {fileID: 3647175325378266580}
+  - component: {fileID: -1822204231326384453}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -171,4 +172,64 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ba83f1c7b8993b479d570d32901069f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerActions
+  gameManager: {fileID: 0}
+  inputMenu: 0
+  inputPlaceSaL: 0
+  moveLadder: 0
+  inputLeftMouseButton: 0
   ladderPrefab: {fileID: 1487118692208556441, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+  player: {fileID: 0}
+--- !u!114 &-1822204231326384453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2483392702695036206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 50d52dfe23396364e88572a10d01899a, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: a497297e-e891-4411-b32d-e9e1115b62e8
+    m_ActionName: 'EndGame/Quit Game[/Keyboard/escape]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 4a5d441a-490b-4f4a-823d-145e5a45fc28
+    m_ActionName: 'Mouse/MousePos[/Mouse/position]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: d4a5e0d5-e5d8-4595-b747-9b01b0b263f3
+    m_ActionName: 'Mouse/Place Sal[/Mouse/leftButton]'
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: d6ff91ea-71ed-4e2d-9984-d1be3cc5998e
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}

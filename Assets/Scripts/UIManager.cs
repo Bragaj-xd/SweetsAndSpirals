@@ -64,19 +64,7 @@ public class UIManager : MonoBehaviour
         
     }
 
-    //roll three logic
-    public void MoveThree()
-    {
-        gameManager.UpdatePlayerPosition(player);
-        gameManager.rolledThree = false;
-        rollThree.SetActive(false);
-    }
-    public void PickCard()
-    {
-        gameManager.AddChanceCard(player);
-        gameManager.rolledThree = false;
-        rollThree.SetActive(false);
-    }
+
 }
 
     
