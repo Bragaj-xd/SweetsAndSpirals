@@ -142,6 +142,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+
         // Check if dice was just spun
         if (diceRoll.wheelSpun > lastWheelNum)
         {
@@ -161,6 +162,7 @@ public class GameManager : MonoBehaviour
                 rolledThree = true;   
             }      
         }
+
     }
     void FindTile(int currentPlayerPos)
     {

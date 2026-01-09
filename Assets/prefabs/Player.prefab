@@ -173,12 +173,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerActions
   gameManager: {fileID: 0}
+  floorManager: {fileID: 0}
   inputMenu: 0
-  inputPlaceSaL: 0
   moveLadder: 0
-  inputLeftMouseButton: 0
   ladderPrefab: {fileID: 1487118692208556441, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
   player: {fileID: 0}
+  startTile: {fileID: 0}
+  diceRoll: {fileID: 0}
+  startTileID: 0
 --- !u!114 &-1822204231326384453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,13 +216,13 @@ MonoBehaviour:
     m_ActionName: 'Mouse/MousePos[/Mouse/position]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
+      - m_Target: {fileID: 3647175325378266580}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: LeftMouseButton
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -228,8 +230,24 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: d4a5e0d5-e5d8-4595-b747-9b01b0b263f3
     m_ActionName: 'Mouse/Place Sal[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3647175325378266580}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: ScrollWheel
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: aea9c1cf-9f20-4927-970b-b8f72d6d0141
+    m_ActionName: 'Mouse/ScrollWheel[/Mouse/scroll]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: d6ff91ea-71ed-4e2d-9984-d1be3cc5998e
+  m_DefaultActionMap: Mouse
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}

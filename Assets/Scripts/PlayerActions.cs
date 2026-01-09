@@ -17,8 +17,28 @@ public class PlayerActions : MonoBehaviour
     GameObject ladderPreview;
     public GameObject player;
     public GameObject startTile;
+    public DiceRoll diceRoll;
     public int startTileID;
     Ladder ladderPreviewScript;
+
+    Vector2 scrollInput;
+
+    int directionIndex = 0;
+
+    readonly Vector3[] directions =
+    {
+        Vector3.left,
+        new Vector3(-0.5f,0f,1f),
+        new Vector3(-1,0,1),
+        new Vector3(-1,0,0.5f),    // left
+        Vector3.forward, // up
+        new Vector3(0.5f,0f,1f),
+        new Vector3(1,0,1),
+        new Vector3(1,0,0.5f),
+        Vector3.right   // right
+        
+        
+    };
 
     void Start()
     {
@@ -28,6 +48,7 @@ public class PlayerActions : MonoBehaviour
         Debug.Log(rollThree);
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         floorManager = GameObject.FindGameObjectWithTag("FloorManager").GetComponent<FloorManager>();
+        diceRoll = GameObject.FindGameObjectWithTag("GameManager").GetComponent<DiceRoll>();
     }
 
     public void OnMenu(InputAction.CallbackContext context) => inputMenu = context.ReadValueAsButton();
@@ -42,9 +63,14 @@ public class PlayerActions : MonoBehaviour
         {
             moveLadder = false;
             Debug.Log("Ladder placement finished");
-        }
-        
             
+        }   
+    }
+
+    public void ScrollWheel(InputAction.CallbackContext context)
+    {
+        scrollInput = context.ReadValue<Vector2>();
+        Debug.Log(scrollInput);
     }
 
     void Update()
@@ -70,8 +96,8 @@ public class PlayerActions : MonoBehaviour
         for (int i = 0; i < segmentCount; i++)
         {
             GameObject seg = Instantiate(ladderPrefab, ladderRoot.transform);
-            seg.transform.localPosition = dir * (i * segmentLength);
-            seg.transform.localRotation = Quaternion.LookRotation(dir);
+            seg.transform.localPosition = Vector3.forward * (i * segmentLength);
+            seg.transform.localRotation = Quaternion.identity;
         }
         ladderRoot.transform.SetParent(floorManager.gameObject.transform);
         Ladder ladderScript = ladderRoot.AddComponent<Ladder>();
@@ -89,7 +115,7 @@ public class PlayerActions : MonoBehaviour
         return ladderRoot;
     }
 
-    void MoveLadder()
+    public void MoveLadder()
     {
 
         if (!GetMouseWorldPoint(out Vector3 mouseWorldPos))
@@ -100,8 +126,24 @@ public class PlayerActions : MonoBehaviour
         {
             ladderPreview = BuildLadder(startTile.transform.position);
             ladderPreviewScript = ladderPreview.GetComponent<Ladder>();
+            directionIndex = 0;
             
         }
+
+        if (Mathf.Abs(scrollInput.y) > 0.1f)
+        {
+            directionIndex += scrollInput.y > 0 ? 1 : -1;
+
+            if (directionIndex < 0)
+                directionIndex = directions.Length - 1;
+            if (directionIndex >= directions.Length)
+                directionIndex = 0;
+
+            scrollInput = Vector2.zero; // consume input
+        }
+
+        Vector3 dir = directions[directionIndex];
+        ladderPreview.transform.rotation = Quaternion.LookRotation(dir);
 
        
         ladderPreview.transform.position = startTile.transform.position + new Vector3(0, 0.1f, 0);
