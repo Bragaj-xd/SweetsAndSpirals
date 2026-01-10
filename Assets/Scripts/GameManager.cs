@@ -184,7 +184,7 @@ public class GameManager : MonoBehaviour
     
     int PickRandomCard()
     {
-        return Random.Range(0,2);
+        return Random.Range(0,4);
     }
     GameObject SpawnCard()
     {

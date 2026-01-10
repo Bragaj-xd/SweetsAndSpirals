@@ -18,6 +18,8 @@ public class FloorManager : MonoBehaviour
     public Tile finishTile;
     public List<GameObject> ladders = new List<GameObject>();
     public List<GameObject> snakes = new List<GameObject>();
+    public List<GameObject> jams = new List<GameObject>();
+    public List<GameObject> caramels = new List<GameObject>();
 
     void Awake()
     {
@@ -255,8 +257,8 @@ public class FloorManager : MonoBehaviour
 
     GameObject BuildLadder(Tile startTile, Tile endTile)
     {
-        Vector3 startPos = startTile.GetComponentInChildren<LadderPos>().transform.position;
-        Vector3 endPos = endTile.GetComponentInChildren<LadderPos>().transform.position;
+        Vector3 startPos = startTile.GetComponentInChildren<SaLPos>().transform.position;
+        Vector3 endPos = endTile.GetComponentInChildren<SaLPos>().transform.position;
 
         Vector3 dir = (endPos - startPos).normalized;
         float totalDistance = Vector3.Distance(startPos, endPos);

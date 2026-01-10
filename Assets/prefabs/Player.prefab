@@ -175,11 +175,12 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   floorManager: {fileID: 0}
   inputMenu: 0
-  moveLadder: 0
-  moveSnake: 0
+  moveSaL: 0
   ladderPrefab: {fileID: 1487118692208556441, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
   saLPrefab: {fileID: 0}
   snakePrefab: {fileID: 1487118692208556441, guid: 66691615dc1e7924c938b5d1c6e4b26b, type: 3}
+  jamPrefab: {fileID: 1445579540440842713, guid: 20ba11e637b484347af8d436abeaa122, type: 3}
+  caramelPrefab: {fileID: 2383636872375038502, guid: 87d82fb54eb8cf04ea165059dbf54a26, type: 3}
   player: {fileID: 0}
   startTile: {fileID: 0}
   diceRoll: {fileID: 0}
