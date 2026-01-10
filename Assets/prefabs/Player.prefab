@@ -176,7 +176,10 @@ MonoBehaviour:
   floorManager: {fileID: 0}
   inputMenu: 0
   moveLadder: 0
+  moveSnake: 0
   ladderPrefab: {fileID: 1487118692208556441, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
+  saLPrefab: {fileID: 0}
+  snakePrefab: {fileID: 1487118692208556441, guid: 66691615dc1e7924c938b5d1c6e4b26b, type: 3}
   player: {fileID: 0}
   startTile: {fileID: 0}
   diceRoll: {fileID: 0}

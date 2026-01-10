@@ -27,14 +27,6 @@ using UnityEngine.UI;
         -------------------
                 - 5 locked states from start
 
-    - prio          - adding SaL by player
-                    - 3 lengths for Sal
-                    - spawn logic
-                        - hover SaL on desk
-                        - rotate with mouse wheel
-                        - place to nearest tiles
-                        
-
                 - add jam
                 - add caramel
                 - add chance cards spawns
@@ -70,6 +62,7 @@ public class GameManager : MonoBehaviour
     public DiceRoll diceRoll;
     public GameObject cardPrefab;
     public bool rolledThree;
+    public GameObject rollThree;
     
     
     public List<string> playerPositionNames = new List<string>()
@@ -191,14 +184,14 @@ public class GameManager : MonoBehaviour
     
     int PickRandomCard()
     {
-        return Random.Range(0, 8);
+        return Random.Range(0,2);
     }
     GameObject SpawnCard()
     {
         Vector3 pos = new Vector3(0f, 0f);
         GameObject newCard = Instantiate(cardPrefab, pos, Quaternion.identity, transform);
         newCard.name = "Card";
-        newCard.GetComponent<CardStats>().cardId = 1;//PickRandomCard();
+        newCard.GetComponent<CardStats>().cardId = PickRandomCard();
 
         return newCard;
     }
@@ -305,6 +298,7 @@ public class GameManager : MonoBehaviour
                 foreach (GameObject l in floorManager.ladders)
                 {
                     Ladder ladder = l.GetComponent<Ladder>();
+                    Debug.Log(ladder);
                     if (ladder != null && ladder.startTile == tileID)
                     {
                         int endID = ladder.endTile;
@@ -313,7 +307,7 @@ public class GameManager : MonoBehaviour
                         yield return StartCoroutine(MoveAlongSegments(player, ladder.segmentPositions));
 
                         player.GetComponent<PlayerStats>().currentPos = endID;
-                        playerToMove = (playerToMove + 1) % players.Count;
+                        SnapPlayerToTile(player, endID);
                         //rollTheDice.interactable = true;
                         break; // assume only one ladder per start
                     }
@@ -330,10 +324,11 @@ public class GameManager : MonoBehaviour
                         int endID = snake.endTile;
                         // small pause before sliding
                         yield return new WaitForSeconds(0.2f);
+                        Debug.Log("move player");
                         yield return StartCoroutine(MoveAlongSegments(player, snake.segmentPositions));
 
                         player.GetComponent<PlayerStats>().currentPos = endID;
-                        playerToMove = (playerToMove + 1) % players.Count;
+                        SnapPlayerToTile(player, endID);
                         //rollTheDice.interactable = true;
                         break; // assume only one snake per start
                     }
@@ -345,11 +340,22 @@ public class GameManager : MonoBehaviour
                 yield break;
         }
     }
+
+    void SnapPlayerToTile(GameObject player, int tileID)
+    {
+        Tile tile = floorManager.FindTileByID(tileID);
+        if (tile == null) return;
+
+        Transform marker = GetMarkerForPlayer(tile, player);
+        if (marker != null)
+            player.transform.position = marker.position;
+    }
     IEnumerator MoveAlongSegments(GameObject player, List<Transform> segments)
     {
         foreach (Transform seg in segments)
         {
             player.transform.position = seg.position;
+            Debug.Log("moving player");
 
             // small delay between segment steps
             yield return new WaitForSeconds(0.15f);

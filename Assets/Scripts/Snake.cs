@@ -1,21 +1,16 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Snake : MonoBehaviour
+public class Snake : SaLBase
 {
-    public int startTile;
-    public int endTile;
-    public List<Transform> segmentPositions = new List<Transform>();
-
-    void Awake()
+    public override void UpdateEndTile()
     {
-        // automatically collect all "pos" transforms under this ladder
-        segmentPositions.Clear();
-        var poses = GetComponentsInChildren<Transform>();
-        foreach (var t in poses)
-        {
-            if (t.name == "pos")
-                segmentPositions.Add(t);
-        }
+        if (segmentPositions.Count == 0)
+            return;
+
+        Transform firstSegment = segmentPositions[^1];
+        Debug.Log(firstSegment);
+
+        if (TryGetTileBelow(firstSegment, out Tile tile))
+            endTile = tile.tileID;
     }
 }

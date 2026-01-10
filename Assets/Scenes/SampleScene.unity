@@ -6381,6 +6381,7 @@ MonoBehaviour:
   diceRoll: {fileID: 1113944633}
   cardPrefab: {fileID: 6451148145761191600, guid: 600bfede72a072d4ea4b62b87eed4857, type: 3}
   rolledThree: 0
+  rollThree: {fileID: 1019989721}
   playerPositionNames:
   - Red Position
   - Blue Position
@@ -6728,6 +6729,7 @@ MonoBehaviour:
   snakePrefab: {fileID: 1487118692208556441, guid: 66691615dc1e7924c938b5d1c6e4b26b, type: 3}
   width: 10
   height: 10
+  MaxTileID: 0
   tileSize: 1.2
   finishTile: {fileID: 0}
   ladders: []

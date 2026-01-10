@@ -10,22 +10,23 @@ public class PlayerActions : MonoBehaviour
     public FloorManager floorManager;
     private GameObject rollThree;
     public bool inputMenu;
-    public bool moveLadder;
+    public bool moveSaL;
     PlayerStats playerStats;
     public GameObject ladderPrefab;
-    Vector3 dir = new Vector3(0,0,1);
-    GameObject ladderPreview;
+    public GameObject saLPrefab;
+    public GameObject snakePrefab;
+    GameObject saLPreview;
+    global::SaLBase saLPreviewScript;
     public GameObject player;
     public GameObject startTile;
     public DiceRoll diceRoll;
     public int startTileID;
-    Ladder ladderPreviewScript;
 
     Vector2 scrollInput;
 
     int directionIndex = 0;
 
-    readonly Vector3[] directions =
+    readonly Vector3[] ladderDirections =
     {
         Vector3.left,
         new Vector3(-0.5f,0f,1f),
@@ -40,13 +41,79 @@ public class PlayerActions : MonoBehaviour
         
     };
 
+    readonly Vector3[] snakeDirections =
+    {
+        Vector3.left,
+        new Vector3(-1f,0f,-0.5f),
+        new Vector3(-1,0,-1),
+        new Vector3(-0.5f,0,-1f),    // left
+        Vector3.back, // up
+        new Vector3(0.5f,0f,-1f),
+        new Vector3(1,0,-1),
+        new Vector3(1,0,-0.5f),
+        Vector3.right   // right
+        
+        
+    };
+
+    Vector3[] CurrentDirections =>
+    placingType == SaLType.Ladder ? ladderDirections : snakeDirections;
+
+    public enum SaLType
+    {
+        Ladder,
+        Snake
+    }
+
+    SaLType placingType;
+
+    public abstract class SaLBase : MonoBehaviour
+    {
+        public int startTile;
+        public int endTile;
+
+        
+        public abstract void UpdateEndTile();
+        public List<Transform> segmentPositions = new();
+        
+    }
+    public class Ladder : SaLBase
+    {
+
+        public override void UpdateEndTile()
+        {
+            if (segmentPositions.Count == 0)
+                return;
+
+            Transform lastSegment = segmentPositions[^1];
+
+            Tile tile = lastSegment.GetComponentInParent<Tile>();
+            if (tile != null)
+                endTile = tile.tileID;
+        }
+    }
+    public class Snake  : SaLBase
+    {
+
+        public override void UpdateEndTile()
+        {
+            if (segmentPositions.Count == 0)
+                return;
+
+            Transform lastSegment = segmentPositions[^1];
+
+            Tile tile = lastSegment.GetComponentInParent<Tile>();
+            if (tile != null)
+                endTile = tile.tileID;
+        }
+    }
+
     void Start()
     {
         playerStats = GetComponent<PlayerStats>();
         player = gameObject;
-        rollThree = GameObject.FindGameObjectWithTag("RollThree");
-        Debug.Log(rollThree);
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+        rollThree = gameManager.rollThree;
         floorManager = GameObject.FindGameObjectWithTag("FloorManager").GetComponent<FloorManager>();
         diceRoll = GameObject.FindGameObjectWithTag("GameManager").GetComponent<DiceRoll>();
     }
@@ -59,10 +126,15 @@ public class PlayerActions : MonoBehaviour
             return;
 
 
-        if (moveLadder)
+        if (moveSaL)
         {
-            moveLadder = false;
-            Debug.Log("Ladder placement finished");
+            moveSaL = false;
+            Debug.Log("SaL placement finished");
+            // Finalize this SaL
+            saLPreviewScript.UpdateEndTile();
+
+            saLPreview = null;
+            saLPreviewScript = null;
             
         }   
     }
@@ -70,7 +142,6 @@ public class PlayerActions : MonoBehaviour
     public void ScrollWheel(InputAction.CallbackContext context)
     {
         scrollInput = context.ReadValue<Vector2>();
-        Debug.Log(scrollInput);
     }
 
     void Update()
@@ -79,78 +150,135 @@ public class PlayerActions : MonoBehaviour
         {
             Application.Quit();
         }
-        if(moveLadder)
+        if(moveSaL)
         {
-            MoveLadder();
+            MoveSaL();
         }
+
     }
-    GameObject BuildLadder(Vector3 startPos)
+    GameObject BuildSaL(Vector3 startPos)
     {
+        string saLname = "";
+        if(placingType == SaLType.Ladder)
+        {
+            saLname = "Ladder";
+            saLPrefab = ladderPrefab;
+        }
+        if(placingType == SaLType.Snake)
+        {
+            saLname = "Snake";
+            saLPrefab = snakePrefab;
+        }
         float segmentLength = 1f;
         int segmentCount = Random.Range(2, 5);
 
-        GameObject ladderRoot = new GameObject("Ladder");
-        
-        ladderRoot.transform.position = startPos;
+        GameObject saLRoot = new GameObject(saLname);
+        saLRoot.transform.position = startPos;
 
         for (int i = 0; i < segmentCount; i++)
         {
-            GameObject seg = Instantiate(ladderPrefab, ladderRoot.transform);
-            seg.transform.localPosition = Vector3.forward * (i * segmentLength);
-            seg.transform.localRotation = Quaternion.identity;
+            GameObject seg = Instantiate(saLPrefab, saLRoot.transform);
+            seg.transform.localPosition = new Vector3(0, 0, i * segmentLength);
+            seg.transform.localRotation = Quaternion.identity; // only once
         }
-        ladderRoot.transform.SetParent(floorManager.gameObject.transform);
-        Ladder ladderScript = ladderRoot.AddComponent<Ladder>();
-        floorManager.ladders.Add(ladderRoot);
+        saLRoot.transform.SetParent(floorManager.gameObject.transform);
+        global::SaLBase saLScript = null;
+        if(placingType == SaLType.Ladder)
+        {
+            saLScript = saLRoot.AddComponent<global::Ladder>();
+            floorManager.ladders.Add(saLRoot);
+        }
+        if(placingType == SaLType.Snake)
+        {
+            saLScript = saLRoot.AddComponent<global::Snake>();
+            floorManager.snakes.Add(saLRoot);
+        }
         
-        var poses = ladderRoot.GetComponentsInChildren<Transform>();
+        
+        
+        var poses = saLRoot.GetComponentsInChildren<Transform>();
         foreach (var t in poses)
         {
             if (t.name == "pos")
-                ladderScript.segmentPositions.Add(t);
-                
+                saLScript.segmentPositions.Add(t);
         }
         
 
-        return ladderRoot;
+        return saLRoot;
     }
 
-    public void MoveLadder()
+    public void MoveSaL()
     {
 
         if (!GetMouseWorldPoint(out Vector3 mouseWorldPos))
             return;
         
 
-        if (ladderPreview == null)
+        if (saLPreview == null)
         {
-            ladderPreview = BuildLadder(startTile.transform.position);
-            ladderPreviewScript = ladderPreview.GetComponent<Ladder>();
+            saLPreview = BuildSaL(startTile.transform.position);
+            if(placingType == SaLType.Ladder)
+            {
+                saLPreviewScript = saLPreview.GetComponent<global::Ladder>();
+            }
+            if(placingType == SaLType.Snake)
+            {
+                saLPreviewScript = saLPreview.GetComponent<global::Snake>();
+            }
             directionIndex = 0;
-            
         }
+
+        Vector3[] dirs = CurrentDirections;
 
         if (Mathf.Abs(scrollInput.y) > 0.1f)
         {
             directionIndex += scrollInput.y > 0 ? 1 : -1;
 
             if (directionIndex < 0)
-                directionIndex = directions.Length - 1;
-            if (directionIndex >= directions.Length)
+                directionIndex = dirs.Length - 1;
+            if (directionIndex >= dirs.Length)
                 directionIndex = 0;
 
-            scrollInput = Vector2.zero; // consume input
+            if (Mathf.Abs(scrollInput.y) > 0.1f)
+            {
+                directionIndex += scrollInput.y > 0 ? 1 : -1;
+                directionIndex = (directionIndex + CurrentDirections.Length) % CurrentDirections.Length;
+                scrollInput = Vector2.zero;
+            }
         }
 
-        Vector3 dir = directions[directionIndex];
-        ladderPreview.transform.rotation = Quaternion.LookRotation(dir);
+        Vector3 dir = CurrentDirections[directionIndex].normalized;
 
-       
-        ladderPreview.transform.position = startTile.transform.position + new Vector3(0, 0.1f, 0);
-        ladderPreviewScript.startTile = startTileID;
-        ladderPreviewScript.UpdateEndTile();
-        floorManager.FindTileByID(startTileID).tileFunction = 1;
-        floorManager.FindTileByID(ladderPreviewScript.endTile).tileFunction = 2;
+        saLPreview.transform.rotation =
+            Quaternion.LookRotation(new Vector3(dir.x, 0f, dir.z));
+
+        saLPreview.transform.position = startTile.transform.position + new Vector3(0, 0.1f, 0);
+
+        //int stepDelta = floorManager.GetSerpentineTileDelta(startTileID, dir, floorManager.width);
+
+
+        int length = saLPreviewScript.segmentPositions.Count - 1;
+        
+        saLPreviewScript.startTile = startTileID;
+        //saLPreviewScript.endTile = startTileID + stepDelta * length;
+        saLPreviewScript.UpdateEndTile();
+
+        saLPreviewScript.endTile = Mathf.Clamp(
+            saLPreviewScript.endTile,
+            0,
+            floorManager.MaxTileID
+        );
+
+        if(placingType == SaLType.Ladder)
+        {
+            floorManager.FindTileByID(startTileID).tileFunction = 1;
+            floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 2;
+        }
+        if(placingType == SaLType.Snake)
+         {
+            floorManager.FindTileByID(startTileID).tileFunction = 3;
+            floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 4;
+        }
 
         
     }
@@ -197,9 +325,19 @@ public class PlayerActions : MonoBehaviour
             rollThree.SetActive(false);
             foreach (GameObject card in playerStats.cards)
             {
-                if (card.GetComponent<CardStats>().cardId == 1)
+                CardStats stats = card.GetComponent<CardStats>();
+
+                if (stats.cardId == 0)
                 {
-                    moveLadder = true;
+                    placingType = SaLType.Ladder;
+                    moveSaL = true;
+                    break;
+                }
+                else if (stats.cardId == 1)
+                {
+                    placingType = SaLType.Snake;
+                    moveSaL = true;
+                    break;
                 }
             }
         }

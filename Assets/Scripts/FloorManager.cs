@@ -11,6 +11,7 @@ public class FloorManager : MonoBehaviour
     public GameObject snakePrefab;
     public int width = 10;
     public int height = 10;
+    public int MaxTileID;
     public float tileSize = 2f;
 
     [HideInInspector] public Tile[,] tiles;
@@ -20,6 +21,7 @@ public class FloorManager : MonoBehaviour
 
     void Awake()
     {
+        MaxTileID = width * height;
         GenerateFloor();
         //generateSaL();
     }
@@ -52,6 +54,50 @@ public class FloorManager : MonoBehaviour
         }
 
         Debug.Log($"Generated {idCounter} tiles in zigzag pattern.");
+    }
+
+    public int GetRow(int tileID)
+        {
+            return tileID / width;
+        }
+
+        public bool IsRowReversed(int tileID)
+        {
+            return GetRow(tileID) % 2 == 1;
+        }
+    public int GetSerpentineTileDelta(int startTileID, Vector3 dir, int boardWidth)
+    {
+        dir = dir.normalized;
+        int row = startTileID / boardWidth;
+        bool reversed = row % 2 == 1;
+
+        // Vertical movement
+        if (Mathf.Abs(dir.z) > Mathf.Abs(dir.x))
+        {
+            return dir.z > 0
+                ? boardWidth      // up
+                : -boardWidth;    // down
+        }
+
+        // Horizontal movement
+        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.z))
+        {
+            if (!reversed)
+                return dir.x > 0 ? 1 : -1;
+            else
+                return dir.x > 0 ? -1 : 1;
+        }
+
+        // Diagonal
+        int dx;
+        if (!reversed)
+            dx = dir.x > 0 ? 1 : -1;
+        else
+            dx = dir.x > 0 ? -1 : 1;
+
+        int dz = dir.z > 0 ? boardWidth : -boardWidth;
+
+        return dx + dz;
     }
 
     void CreateTile(int x, int z, ref int idCounter)
