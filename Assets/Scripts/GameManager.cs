@@ -26,7 +26,7 @@ using UnityEngine.UI;
             SaL spawning
         -------------------
                 - 5 locked states from start
-
+                - snakes, ladders - cap to tiles
                 - add jam
                 - add caramel
                 - add chance cards spawns
@@ -130,13 +130,23 @@ public class GameManager : MonoBehaviour
                 break;
             }
         }
-        
+        activePlayer = players[playerToMove];
     }
 
     void Update()
     {
-
         // Check if dice was just spun
+        activePlayer = players[playerToMove];
+
+        PlayerStats stats = activePlayer.GetComponent<PlayerStats>();
+        if (stats.skipNextTurn)
+        {
+            Debug.Log($"{activePlayer.name} skips this turn due to caramel");
+
+            stats.skipNextTurn = false; // consume skip
+            playerToMove = (playerToMove + 1) % players.Count;
+            return;
+        }
         if (diceRoll.wheelSpun > lastWheelNum)
         {
             rollTheDice.interactable = false;
@@ -145,21 +155,31 @@ public class GameManager : MonoBehaviour
             
             lastWheelNum = diceRoll.wheelSpun;
 
-            activePlayer = players[playerToMove];
             if (diceRoll.wheelValue != 3)
-            {
-                UpdatePlayerPosition(activePlayer);
+            {           
+                    UpdatePlayerPosition(activePlayer);
             }
             if(diceRoll.wheelValue == 3)
             {
                 rolledThree = true;   
             }      
         }
-
     }
     void FindTile(int currentPlayerPos)
     {
-        int targetID = currentPlayerPos + diceRoll.wheelValue;
+        int targetID;
+        
+        if(activePlayer.GetComponent<PlayerStats>().jamInUse > 0)
+            {
+                targetID = currentPlayerPos + diceRoll.wheelValue -1;
+                activePlayer.GetComponent<PlayerStats>().jamInUse -=1;
+                Debug.Log(activePlayer.GetComponent<PlayerStats>().jamInUse);
+            }
+        else
+            targetID = currentPlayerPos + diceRoll.wheelValue;
+
+            
+        
         GameObject player = players[playerToMove];
 
         if (!isMoving)
@@ -333,6 +353,14 @@ public class GameManager : MonoBehaviour
                         break; // assume only one snake per start
                     }
                 }
+                break;
+            case 5: //jam
+                Debug.Log($"{player.name} stepped on a jam at {tileID}");
+                activePlayer.GetComponent<PlayerStats>().jamInUse = 2;
+                break;
+            case 6: //caramel
+                Debug.Log($"{player.name} stepped on a caramel at {tileID}");
+                activePlayer.GetComponent<PlayerStats>().skipNextTurn = true;
                 break;
 
             // other tileFunctions (0,2,4) can be handled here if needed

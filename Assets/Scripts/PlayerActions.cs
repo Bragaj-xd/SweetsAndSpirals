@@ -146,7 +146,7 @@ public class PlayerActions : MonoBehaviour
                 break;
             case SaLType.Jam:
                 saLname = "Jam";
-                saLPrefab = caramelPrefab;
+                saLPrefab = jamPrefab;
                 break;
             case SaLType.Caramel:
                 saLname = "Caramel";

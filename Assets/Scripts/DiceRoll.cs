@@ -12,7 +12,7 @@ public class DiceRoll : MonoBehaviour
         
         Debug.Log(wheelSpun);
         wheelValue = Random.Range(1, 7);
-        wheelValue = 3;     //debug
+        //wheelValue = 3;     //debug
         Debug.Log("Rolled: " + wheelValue);
         wheelSpinText.text = (wheelValue.ToString());
         wheelSpun++;
