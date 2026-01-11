@@ -27,21 +27,16 @@ using UnityEngine.UI;
         -------------------
                 - 5 locked states from start
                 - snakes, ladders - cap to tiles
-                - add jam
-                - add caramel
                 - add chance cards spawns
                 
         -------------------
             UI
         -------------------
-                - start screen
                 - updated UI (graphics shit)
         -------------------
             Graphics
         -------------------
                 - snakes
-                - jam
-                - caramel
         -------------------
             Multiplayer
         -------------------
@@ -197,7 +192,6 @@ public class GameManager : MonoBehaviour
         GameObject newCard = SpawnCard();
 
         player.GetComponent<PlayerStats>().cards.Add(newCard);
-        playerToMove = (playerToMove + 1) % players.Count;
         rollTheDice.interactable = true;
         Debug.Log($"Added card {newCard.name} to {player.name}'s cards!");
     }
@@ -362,7 +356,10 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"{player.name} stepped on a caramel at {tileID}");
                 activePlayer.GetComponent<PlayerStats>().skipNextTurn = true;
                 break;
-
+            case 7: //chance
+                Debug.Log($"{player.name} stepped on a chance tile at {tileID}");
+                activePlayer.GetComponent<PlayerActions>().PickCard();
+                break;
             // other tileFunctions (0,2,4) can be handled here if needed
             default:
                 yield break;

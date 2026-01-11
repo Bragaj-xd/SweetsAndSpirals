@@ -72,17 +72,6 @@ public class PlayerActions : MonoBehaviour
 
     SaLType placingType;
 
-    public abstract class SaLBase : MonoBehaviour
-    {
-        public int startTile;
-        public int endTile;
-
-        
-        public abstract void UpdateEndTile();
-        public List<Transform> segmentPositions = new();
-        
-    }
-
 
     void Start()
     {

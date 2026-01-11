@@ -13,6 +13,7 @@ public class FloorManager : MonoBehaviour
     public int height = 10;
     public int MaxTileID;
     public float tileSize = 2f;
+    public Material chanceCardMat;
 
     [HideInInspector] public Tile[,] tiles;
     public Tile finishTile;
@@ -20,6 +21,7 @@ public class FloorManager : MonoBehaviour
     public List<GameObject> snakes = new List<GameObject>();
     public List<GameObject> jams = new List<GameObject>();
     public List<GameObject> caramels = new List<GameObject>();
+    public List<int> ChanceCardId = new List<int> { 6,12,16,25,29,37,43,55,67,74,82,90 };
 
     void Awake()
     {
@@ -113,6 +115,15 @@ public class FloorManager : MonoBehaviour
 
         // Assign unique ID
         tile.tileID = idCounter;
+        foreach(int i in ChanceCardId)
+        {
+            if(idCounter == i )
+            {
+                tile.tileFunction = 7;
+                tile.GetComponentInChildren<Renderer>().material = chanceCardMat;
+            }
+        }
+        
         if(tile.tileID == (width * height) - 1)
         {
             finishTile = tile;
