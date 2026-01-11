@@ -353,6 +353,9 @@ public class PlayerActions : MonoBehaviour
                         placingType = SaLType.Caramel;
                         moveSaL = true;
                         break;
+                    case 4:
+                        gameManager.SnapPlayerToTile(player,player.GetComponent<PlayerStats>().currentPos - 2);
+                        break;
                 }
             }
         }

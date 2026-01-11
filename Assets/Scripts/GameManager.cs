@@ -366,7 +366,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void SnapPlayerToTile(GameObject player, int tileID)
+    public void SnapPlayerToTile(GameObject player, int tileID)
     {
         Tile tile = floorManager.FindTileByID(tileID);
         if (tile == null) return;
@@ -374,6 +374,8 @@ public class GameManager : MonoBehaviour
         Transform marker = GetMarkerForPlayer(tile, player);
         if (marker != null)
             player.transform.position = marker.position;
+            playerToMove = (playerToMove + 1) % players.Count;
+
     }
     IEnumerator MoveAlongSegments(GameObject player, List<Transform> segments)
     {
