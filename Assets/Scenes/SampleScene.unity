@@ -3004,8 +3004,20 @@ PrefabInstance:
       value: Wheel
       objectReference: {fileID: 0}
     - target: {fileID: 8771496895493566230, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.1503
+      objectReference: {fileID: 0}
+    - target: {fileID: 8771496895493566230, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.1503
+      objectReference: {fileID: 0}
+    - target: {fileID: 8771496895493566230, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.1503
+      objectReference: {fileID: 0}
+    - target: {fileID: 8771496895493566230, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.75
+      value: -6.11
       objectReference: {fileID: 0}
     - target: {fileID: 8771496895493566230, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3013,7 +3025,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8771496895493566230, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 5.08
+      value: 5.04
       objectReference: {fileID: 0}
     - target: {fileID: 8771496895493566230, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3046,7 +3058,25 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7199938429339032223, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 1008380632793763210, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 6381871957148085859, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 6040137415151246789, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 3265694850492018838, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 1890477981180179360, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: ae7ab63c3a0c7ac4eb205397dd379793, type: 3}
 --- !u!1001 &7148789666552518120
 PrefabInstance:
