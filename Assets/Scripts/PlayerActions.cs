@@ -66,7 +66,8 @@ public class PlayerActions : MonoBehaviour
         Ladder,
         Snake,
         Jam,
-        Caramel
+        Caramel,
+        Chance
     }
 
     SaLType placingType;
@@ -107,6 +108,23 @@ public class PlayerActions : MonoBehaviour
             Debug.Log("SaL placement finished");
             // Finalize this SaL
             saLPreviewScript.UpdateEndTile();
+            switch(placingType)
+            {
+                case SaLType.Ladder:
+                    floorManager.FindTileByID(startTileID).tileFunction = 1;
+                    floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 2;
+                    break;
+                case SaLType.Snake:
+                    floorManager.FindTileByID(startTileID).tileFunction = 3;
+                    floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 4;
+                    break;
+                case SaLType.Jam:
+                    floorManager.FindTileByID(startTileID).tileFunction = 5;
+                    break;
+                case SaLType.Caramel:
+                    floorManager.FindTileByID(startTileID).tileFunction = 6;
+                    break;
+            }
 
             saLPreview = null;
             saLPreviewScript = null;
@@ -217,14 +235,6 @@ public class PlayerActions : MonoBehaviour
         if (saLPreview == null)
         {
             saLPreview = BuildSaL(startTile.GetComponentInChildren<SaLPos>().transform.position);
-            if(placingType == SaLType.Ladder)
-            {
-                saLPreviewScript = saLPreview.GetComponent<Ladder>();
-            }
-            if(placingType == SaLType.Snake)
-            {
-                saLPreviewScript = saLPreview.GetComponent<Snake>();
-            }
             switch(placingType)
             {
                 case SaLType.Ladder:
@@ -288,23 +298,7 @@ public class PlayerActions : MonoBehaviour
             floorManager.MaxTileID
         );
 
-        switch(placingType)
-        {
-            case SaLType.Ladder:
-                floorManager.FindTileByID(startTileID).tileFunction = 1;
-                floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 2;
-                break;
-            case SaLType.Snake:
-                floorManager.FindTileByID(startTileID).tileFunction = 3;
-                floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 4;
-                break;
-            case SaLType.Jam:
-                floorManager.FindTileByID(startTileID).tileFunction = 5;
-                break;
-            case SaLType.Caramel:
-                floorManager.FindTileByID(startTileID).tileFunction = 6;
-                break;
-        }
+        
         
     }
 
