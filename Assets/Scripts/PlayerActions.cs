@@ -91,7 +91,17 @@ public class PlayerActions : MonoBehaviour
         rollTheDice = gameManager.rollTheDice;
     }
 
-    public void OnMenu(InputAction.CallbackContext context) => inputMenu = context.ReadValueAsButton();
+    //public void OnMenu(InputAction.CallbackContext context) => inputMenu = context.ReadValueAsButton();
+
+    public void OnMenu(InputAction.CallbackContext context)
+{
+    if (context.started)
+        inputMenu = true;
+
+    if (context.canceled)
+        inputMenu = false;
+
+}
 
     public void LeftMouseButton(InputAction.CallbackContext context)
     {
@@ -142,7 +152,9 @@ public class PlayerActions : MonoBehaviour
     {
         if(inputMenu)
         {
+            Debug.Log("kys");
             Application.Quit();
+            
         }
         if(moveSaL)
         {

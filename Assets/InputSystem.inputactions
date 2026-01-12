@@ -7,7 +7,7 @@
             "id": "077c3c7e-9e83-45cd-bad3-fa2a98bdb235",
             "actions": [
                 {
-                    "name": "Quit Game",
+                    "name": "OnMenu",
                     "type": "Button",
                     "id": "a497297e-e891-4411-b32d-e9e1115b62e8",
                     "expectedControlType": "",
@@ -21,10 +21,10 @@
                     "name": "",
                     "id": "c1d69e6f-843a-42f2-940a-a22f3a219277",
                     "path": "<Keyboard>/escape",
-                    "interactions": "",
+                    "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "Quit Game",
+                    "action": "OnMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
