@@ -97,6 +97,7 @@ public class PlayerActions : MonoBehaviour
 {
     if (context.started)
         inputMenu = true;
+        
 
     if (context.canceled)
         inputMenu = false;
@@ -152,7 +153,7 @@ public class PlayerActions : MonoBehaviour
     {
         if(inputMenu)
         {
-            Debug.Log("kys");
+        
             Application.Quit();
             
         }
