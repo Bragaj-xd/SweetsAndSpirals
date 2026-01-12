@@ -5,9 +5,10 @@ using UnityEngine;
 public class FloorManager : MonoBehaviour
 {
     public GameObject tilePrefab;
-    public GameObject ladderPrefab;
     public GameObject ladder2Prefab;
     public GameObject ladder3Prefab;
+    public GameObject ladder4Prefab;
+    public GameObject ladderPrefab;
     public GameObject snakePrefab;
     public int width = 10;
     public int height = 10;

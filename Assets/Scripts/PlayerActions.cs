@@ -12,9 +12,15 @@ public class PlayerActions : MonoBehaviour
     public bool inputMenu;
     public bool moveSaL;
     PlayerStats playerStats;
+    public GameObject ladder2Prefab;
+    public GameObject ladder3Prefab;
+    public GameObject ladder4Prefab;
     public GameObject ladderPrefab;
     public GameObject saLPrefab;
     public GameObject snakePrefab;
+    public GameObject snake2Prefab;
+    public GameObject snake3Prefab;
+    public GameObject snake4Prefab;
     public GameObject jamPrefab;
     public GameObject caramelPrefab;
     GameObject saLPreview;
@@ -96,7 +102,8 @@ public class PlayerActions : MonoBehaviour
             moveSaL = false;
             Debug.Log("SaL placement finished");
             // Finalize this SaL
-            saLPreviewScript.UpdateEndTile();
+            if(saLPreviewScript)
+                saLPreviewScript.UpdateEndTile();
             switch(placingType)
             {
                 case SaLType.Ladder:
@@ -141,62 +148,67 @@ public class PlayerActions : MonoBehaviour
     GameObject BuildSaL(Vector3 startPos)
     {
         string saLname = "";
+    GameObject chosenPrefab = null;
+
+    int length = Random.Range(2, 5); // 2,3,4
+
+    switch (placingType)
+    {
+        case SaLType.Ladder:
+            saLname = "Ladder";
+            chosenPrefab = length switch
+            {
+                2 => ladder2Prefab,
+                3 => ladder3Prefab,
+                4 => ladder4Prefab,
+                _ => ladder2Prefab
+            };
+            break;
+
+        case SaLType.Snake:
+            saLname = "Snake";
+            chosenPrefab = length switch
+            {
+                2 => snake2Prefab,
+                3 => snake3Prefab,
+                4 => snake4Prefab,
+                _ => snake2Prefab
+            };
+            break;
+
+        case SaLType.Jam:
+            saLname = "Jam";
+            chosenPrefab = jamPrefab;
+            break;
+
+        case SaLType.Caramel:
+            saLname = "Caramel";
+            chosenPrefab = caramelPrefab;
+            break;
+    }
+
+    GameObject saLRoot = Instantiate(chosenPrefab, startPos, Quaternion.identity);
+    saLRoot.name = saLname;
+    saLRoot.transform.SetParent(floorManager.transform);
+
+    SaLBase saLScript = null;
+
         switch(placingType)
         {
             case SaLType.Ladder:
-                saLname = "Ladder";
-                saLPrefab = ladderPrefab;
-                break;
-            case SaLType.Snake:
-                saLname = "Snake";
-                saLPrefab = snakePrefab;
-                break;
-            case SaLType.Jam:
-                saLname = "Jam";
-                saLPrefab = jamPrefab;
-                break;
-            case SaLType.Caramel:
-                saLname = "Caramel";
-                saLPrefab = caramelPrefab;
-                break;
-        }
-        float segmentLength = 1f;
-        int segmentCount;
-        if(placingType == SaLType.Ladder || placingType == SaLType.Snake)
-        {
-            segmentCount = Random.Range(2, 5);
-        }
-        else
-            segmentCount = 1;
-        
-
-        GameObject saLRoot = new GameObject(saLname);
-        saLRoot.transform.position = startPos;
-        for (int i = 0; i < segmentCount; i++)
-        {
-            GameObject seg = Instantiate(saLPrefab, saLRoot.transform);
-            seg.transform.localPosition = new Vector3(0, 0, i * segmentLength);
-            seg.transform.localRotation = Quaternion.identity; // only once
-        }
-        saLRoot.transform.SetParent(floorManager.gameObject.transform);
-        global::SaLBase saLScript = null;
-
-        switch(placingType)
-        {
-            case SaLType.Ladder:
-                saLScript = saLRoot.AddComponent<global::Ladder>();
+                saLScript = saLRoot.AddComponent<Ladder>();
                 floorManager.ladders.Add(saLRoot);
                 break;
             case SaLType.Snake:
-                saLScript = saLRoot.AddComponent<global::Snake>();
+                saLScript = saLRoot.AddComponent<Snake>();
                 floorManager.snakes.Add(saLRoot);
                 break;
             case SaLType.Jam:
-                saLScript = saLRoot.AddComponent<global::Jam>();
+                saLScript = saLRoot.AddComponent<Jam>();
                 floorManager.jams.Add(saLRoot);
                 break;
             case SaLType.Caramel:
-                saLScript = saLRoot.AddComponent<global::Caramel>();
+                saLScript = saLRoot.AddComponent<Caramel>();
                 floorManager.caramels.Add(saLRoot);
                 break;
         }
