@@ -204,6 +204,8 @@ public class FloorManager : MonoBehaviour
         }
         else
             sal.transform.position = startPos.position + new Vector3(0,0.08f,0);
+        
+        ApplyTileFunction(sal);
     }
     void SnapAllSaLs()
     {
@@ -218,6 +220,33 @@ public class FloorManager : MonoBehaviour
 
         foreach (GameObject c in caramels)
             SnapSaLToTiles(c.GetComponent<SaLBase>());
+    }
+
+    void ApplyTileFunction(SaLBase sal)
+    {
+        if (sal == null) return;
+
+        Tile startTile = FindTileByID(sal.startTile);
+        Tile endTile   = FindTileByID(sal.endTile);
+
+        if (sal is Ladder)
+        {
+            if (startTile != null) startTile.tileFunction = 1;
+            if (endTile != null)   endTile.tileFunction   = 2;
+        }
+        else if (sal is Snake)
+        {
+            if (startTile != null) startTile.tileFunction = 3;
+            if (endTile != null)   endTile.tileFunction   = 4;
+        }
+        else if (sal is Jam)
+        {
+            if (startTile != null) startTile.tileFunction = 5;
+        }
+        else if (sal is Caramel)
+        {
+            if (startTile != null) startTile.tileFunction = 6;
+        }
     }
     /*
     void generateSaL()
