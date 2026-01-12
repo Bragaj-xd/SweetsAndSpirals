@@ -28,6 +28,7 @@ public class FloorManager : MonoBehaviour
     {
         MaxTileID = width * height;
         GenerateFloor();
+        SnapAllSaLs();
         //generateSaL();
     }
 
@@ -176,7 +177,48 @@ public class FloorManager : MonoBehaviour
         // All checks passed
         return center;
     }
+    public void SnapSaLToTiles(SaLBase sal)
+    {
+        Tile start = FindTileByID(sal.startTile);
+        if (start == null) return;
 
+        Transform startPos = start.GetComponentInChildren<SaLPos>().transform;
+        if (startPos == null) return;
+
+        // Position root on start tile
+        sal.transform.position = startPos.position;
+
+        // Rotation only matters for snakes/ladders
+        if (sal.startTile != sal.endTile)
+        {
+            
+            Tile end = FindTileByID(sal.endTile);
+            if (end == null) return;
+
+            Transform endPos = end.GetComponentInChildren<SaLPos>().transform;
+            if (endPos == null) return;
+
+            Vector3 dir = (endPos.position - startPos.position).normalized;
+            if (dir != Vector3.zero)
+                sal.transform.rotation = Quaternion.LookRotation(dir);
+        }
+        else
+            sal.transform.position = startPos.position + new Vector3(0,0.08f,0);
+    }
+    void SnapAllSaLs()
+    {
+        foreach (GameObject l in ladders)
+            SnapSaLToTiles(l.GetComponent<SaLBase>());
+
+        foreach (GameObject s in snakes)
+            SnapSaLToTiles(s.GetComponent<SaLBase>());
+
+        foreach (GameObject j in jams)
+            SnapSaLToTiles(j.GetComponent<SaLBase>());
+
+        foreach (GameObject c in caramels)
+            SnapSaLToTiles(c.GetComponent<SaLBase>());
+    }
 
     void generateSaL()
     {

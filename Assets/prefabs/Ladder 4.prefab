@@ -446,7 +446,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Ladder
   startTile: 0
   endTile: 0
-  segmentPositions: []
+  segmentPositions:
+  - {fileID: 4612777730835899789}
+  - {fileID: 141689739826107483}
+  - {fileID: 1767990652447589640}
+  - {fileID: 4247187185868281679}
 --- !u!4 &4420100131703268749 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 01566ff5bf91a774db8a00a2495db606, type: 3}
@@ -506,7 +510,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2712307227644713947, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
       propertyPath: segmentPositions.Array.size
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2712307227644713947, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
       propertyPath: 'segmentPositions.Array.data[0]'

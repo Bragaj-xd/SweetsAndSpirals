@@ -3,9 +3,11 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerActions : MonoBehaviour
 {
+    public Button rollTheDice;
     public GameManager gameManager;
     public FloorManager floorManager;
     private GameObject rollThree;
@@ -21,6 +23,7 @@ public class PlayerActions : MonoBehaviour
     public GameObject snake2Prefab;
     public GameObject snake3Prefab;
     public GameObject snake4Prefab;
+    public List <Material> snakeMats;
     public GameObject jamPrefab;
     public GameObject caramelPrefab;
     GameObject saLPreview;
@@ -51,7 +54,6 @@ public class PlayerActions : MonoBehaviour
 
     readonly Vector3[] snakeDirections =
     {
-        Vector3.left,
         new Vector3(-1f,0f,-0.5f),
         new Vector3(-1,0,-1),
         new Vector3(-0.5f,0,-1f),    // left
@@ -59,7 +61,6 @@ public class PlayerActions : MonoBehaviour
         new Vector3(0.5f,0f,-1f),
         new Vector3(1,0,-1),
         new Vector3(1,0,-0.5f),
-        Vector3.right   // right
         
         
     };
@@ -87,6 +88,7 @@ public class PlayerActions : MonoBehaviour
         rollThree = gameManager.rollThree;
         floorManager = GameObject.FindGameObjectWithTag("FloorManager").GetComponent<FloorManager>();
         diceRoll = GameObject.FindGameObjectWithTag("GameManager").GetComponent<DiceRoll>();
+        rollTheDice = gameManager.rollTheDice;
     }
 
     public void OnMenu(InputAction.CallbackContext context) => inputMenu = context.ReadValueAsButton();
@@ -121,9 +123,12 @@ public class PlayerActions : MonoBehaviour
                     floorManager.FindTileByID(startTileID).tileFunction = 6;
                     break;
             }
-
+            Debug.Log(rollTheDice);
+            if(!rollTheDice.interactable)
+                rollTheDice.interactable = true;
             saLPreview = null;
             saLPreviewScript = null;
+            gameManager.playerToMove = (gameManager.playerToMove + 1) % gameManager.players.Count;
             
         }   
     }
@@ -167,6 +172,7 @@ public class PlayerActions : MonoBehaviour
 
         case SaLType.Snake:
             saLname = "Snake";
+            int snakeColor = Random.Range(0,4);
             chosenPrefab = length switch
             {
                 2 => snake2Prefab,
@@ -174,6 +180,7 @@ public class PlayerActions : MonoBehaviour
                 4 => snake4Prefab,
                 _ => snake2Prefab
             };
+            chosenPrefab.GetComponentInChildren<Renderer>().material = snakeMats[snakeColor];
             break;
 
         case SaLType.Jam:
@@ -191,35 +198,20 @@ public class PlayerActions : MonoBehaviour
     saLRoot.name = saLname;
     saLRoot.transform.SetParent(floorManager.transform);
 
-    SaLBase saLScript = null;
-
         switch(placingType)
         {
             case SaLType.Ladder:
-                saLScript = saLRoot.AddComponent<Ladder>();
                 floorManager.ladders.Add(saLRoot);
                 break;
             case SaLType.Snake:
-                saLScript = saLRoot.AddComponent<Snake>();
                 floorManager.snakes.Add(saLRoot);
                 break;
             case SaLType.Jam:
-                saLScript = saLRoot.AddComponent<Jam>();
                 floorManager.jams.Add(saLRoot);
                 break;
             case SaLType.Caramel:
-                saLScript = saLRoot.AddComponent<Caramel>();
                 floorManager.caramels.Add(saLRoot);
                 break;
-        }
-        
-        
-        
-        var poses = saLRoot.GetComponentsInChildren<Transform>();
-        foreach (var t in poses)
-        {
-            if (t.name == "pos")
-                saLScript.segmentPositions.Add(t);
         }
         
 
@@ -234,7 +226,8 @@ public class PlayerActions : MonoBehaviour
         
 
         if (saLPreview == null)
-        {
+        {   
+            Debug.Log(startTile.GetComponentInChildren<SaLPos>().transform.position);
             saLPreview = BuildSaL(startTile.GetComponentInChildren<SaLPos>().transform.position);
             switch(placingType)
             {

@@ -192,7 +192,7 @@ public class GameManager : MonoBehaviour
         GameObject newCard = SpawnCard();
 
         player.GetComponent<PlayerStats>().cards.Add(newCard);
-        rollTheDice.interactable = true;
+        //rollTheDice.interactable = true;
         Debug.Log($"Added card {newCard.name} to {player.name}'s cards!");
     }
     
@@ -202,7 +202,7 @@ public class GameManager : MonoBehaviour
     }
     GameObject SpawnCard()
     {
-        Vector3 pos = new Vector3(0f, 0f);
+        Vector3 pos = new Vector3(-2.5f, 9.7f);
         GameObject newCard = Instantiate(cardPrefab, pos, Quaternion.identity, transform);
         newCard.name = "Card";
         newCard.GetComponent<CardStats>().cardId = PickRandomCard();
@@ -285,7 +285,8 @@ public class GameManager : MonoBehaviour
 
             if (id == destinationID)
             {
-                playerToMove = (playerToMove + 1) % players.Count;
+                if(tile.tileFunction != 7)
+                    playerToMove = (playerToMove + 1) % players.Count;
                 
                 break;
             }
@@ -294,7 +295,6 @@ public class GameManager : MonoBehaviour
 
         // After arrival, handle tile effects (ladders/snakes)
         yield return StartCoroutine(HandleTileEffects(player, destinationID));
-        rollTheDice.interactable = true;
         isMoving = false;
     }
 
@@ -307,6 +307,9 @@ public class GameManager : MonoBehaviour
 
         switch (tile.tileFunction)
         {
+            case 0: // nothing xd
+                rollTheDice.interactable = true;
+                break;
             case 1: // ladder start
                 Debug.Log($"{player.name} stepped on a ladder at {tileID}");
                 foreach (GameObject l in floorManager.ladders)
@@ -322,10 +325,13 @@ public class GameManager : MonoBehaviour
 
                         player.GetComponent<PlayerStats>().currentPos = endID;
                         SnapPlayerToTile(player, endID);
-                        //rollTheDice.interactable = true;
+                        rollTheDice.interactable = true;
                         break; // assume only one ladder per start
                     }
                 }
+                break;
+            case 2: // ladder end
+                rollTheDice.interactable = true;
                 break;
 
             case 3: // snake start
@@ -343,22 +349,28 @@ public class GameManager : MonoBehaviour
 
                         player.GetComponent<PlayerStats>().currentPos = endID;
                         SnapPlayerToTile(player, endID);
-                        //rollTheDice.interactable = true;
+                        rollTheDice.interactable = true;
                         break; // assume only one snake per start
                     }
                 }
                 break;
+            case 4: // snake end
+                rollTheDice.interactable = true;
+                break;
             case 5: //jam
                 Debug.Log($"{player.name} stepped on a jam at {tileID}");
                 activePlayer.GetComponent<PlayerStats>().jamInUse = 2;
+                rollTheDice.interactable = true;
                 break;
             case 6: //caramel
                 Debug.Log($"{player.name} stepped on a caramel at {tileID}");
                 activePlayer.GetComponent<PlayerStats>().skipNextTurn = true;
+                rollTheDice.interactable = true;
                 break;
             case 7: //chance
                 Debug.Log($"{player.name} stepped on a chance tile at {tileID}");
                 activePlayer.GetComponent<PlayerActions>().PickCard();
+                rollTheDice.interactable = false;
                 break;
             // other tileFunctions (0,2,4) can be handled here if needed
             default:
@@ -374,6 +386,7 @@ public class GameManager : MonoBehaviour
         Transform marker = GetMarkerForPlayer(tile, player);
         if (marker != null)
             player.transform.position = marker.position;
+            player.GetComponent<PlayerStats>().currentPos = tileID;
             playerToMove = (playerToMove + 1) % players.Count;
 
     }

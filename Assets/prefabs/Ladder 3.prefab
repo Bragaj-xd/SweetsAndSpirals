@@ -444,7 +444,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2712307227644713947, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
       propertyPath: segmentPositions.Array.size
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2712307227644713947, guid: 2509386ca3ec5a84b93a7f7e703e5fe1, type: 3}
       propertyPath: 'segmentPositions.Array.data[0]'
