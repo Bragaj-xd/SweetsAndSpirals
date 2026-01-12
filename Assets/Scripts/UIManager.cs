@@ -4,6 +4,7 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public TextMeshProUGUI winScreenText;
+    public GameObject winScreen;
     public TextMeshProUGUI playerToMoveText;
     public GameObject rollThree;
     public GameManager gameManager;
@@ -14,7 +15,7 @@ public class UIManager : MonoBehaviour
     {
         if(winScreenText != null)
         {
-            winScreenText.gameObject.SetActive(false);
+            winScreen.gameObject.SetActive(false);
         }
         if(rollThree != null)
         {
@@ -42,7 +43,7 @@ public class UIManager : MonoBehaviour
             {
                 if(p.GetComponent<PlayerStats>().currentPos == floorManager.finishTile.tileID)
                 {
-                    winScreenText.gameObject.SetActive(true);
+                    winScreen.gameObject.SetActive(true);
                     winScreenText.text = p.name + " Won";
                 }
             }

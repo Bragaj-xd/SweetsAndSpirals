@@ -219,7 +219,7 @@ public class FloorManager : MonoBehaviour
         foreach (GameObject c in caramels)
             SnapSaLToTiles(c.GetComponent<SaLBase>());
     }
-
+    /*
     void generateSaL()
     {
         List<int> SaLEndTiles = new List<int> {8, 24, 23, 9, 22, 30, 21, 12, 18, 19, 11, 20};
@@ -329,9 +329,6 @@ public class FloorManager : MonoBehaviour
             GameObject seg = Instantiate(ladderPrefab, pos, Quaternion.LookRotation(dir), ladderRoot.transform);
         }
 
-        Ladder ladderComp = ladderRoot.AddComponent<Ladder>();
-        ladderComp.startTile = startTile.tileID;
-        ladderComp.endTile   = endTile.tileID;
 
         return ladderRoot;
     }
@@ -366,12 +363,7 @@ public class FloorManager : MonoBehaviour
             );
         }
 
-        // Add script to root
-        Snake snakeComp = snakeRoot.AddComponent<Snake>();
-        snakeComp.startTile = startTile.tileID;
-        snakeComp.endTile   = endTile.tileID;
-
         return snakeRoot;
     }
-    
+    */
 }
