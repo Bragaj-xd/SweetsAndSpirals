@@ -190,10 +190,10 @@ MonoBehaviour:
   snake3Prefab: {fileID: 8234110704223635388, guid: 28e37f00e1900954fae55fe1944d7075, type: 3}
   snake4Prefab: {fileID: 2111448119333215427, guid: 4f331484394b7754e9837cae18864bce, type: 3}
   snakeMats:
-  - {fileID: 2100000, guid: 4752b478ed87c6f48bb3085fb77bc370, type: 2}
-  - {fileID: 2100000, guid: a729a670c4c79ff4887fa5690e557329, type: 2}
-  - {fileID: 2100000, guid: 5a92a40514ec7ab44b0c1dba62d94753, type: 2}
-  - {fileID: 2100000, guid: 7f26a24a23b07ba48939fe7ec0e8ee05, type: 2}
+  - {fileID: 2100000, guid: c019b21aa71d49240ba51c9261b3f40f, type: 2}
+  - {fileID: 2100000, guid: cd60c9314db01cf4a89b915bde975609, type: 2}
+  - {fileID: 2100000, guid: e9aefaa53d1aabb45b726cac79494cda, type: 2}
+  - {fileID: 2100000, guid: 7af777f97dfb22f41aba796028a18e51, type: 2}
   jamPrefab: {fileID: 1445579540440842713, guid: 20ba11e637b484347af8d436abeaa122, type: 3}
   caramelPrefab: {fileID: 2383636872375038502, guid: 87d82fb54eb8cf04ea165059dbf54a26, type: 3}
   player: {fileID: 0}
