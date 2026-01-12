@@ -153,50 +153,50 @@ public class PlayerActions : MonoBehaviour
     GameObject BuildSaL(Vector3 startPos)
     {
         string saLname = "";
-    GameObject chosenPrefab = null;
+        GameObject chosenPrefab = null;
 
-    int length = Random.Range(2, 5); // 2,3,4
+        int length = Random.Range(2, 5); // 2,3,4
 
-    switch (placingType)
-    {
-        case SaLType.Ladder:
-            saLname = "Ladder";
-            chosenPrefab = length switch
-            {
-                2 => ladder2Prefab,
-                3 => ladder3Prefab,
-                4 => ladder4Prefab,
-                _ => ladder2Prefab
-            };
-            break;
+        switch (placingType)
+        {
+            case SaLType.Ladder:
+                saLname = "Ladder";
+                chosenPrefab = length switch
+                {
+                    2 => ladder2Prefab,
+                    3 => ladder3Prefab,
+                    4 => ladder4Prefab,
+                    _ => ladder2Prefab
+                };
+                break;
 
-        case SaLType.Snake:
-            saLname = "Snake";
-            int snakeColor = Random.Range(0,4);
-            chosenPrefab = length switch
-            {
-                2 => snake2Prefab,
-                3 => snake3Prefab,
-                4 => snake4Prefab,
-                _ => snake2Prefab
-            };
-            chosenPrefab.GetComponentInChildren<Renderer>().material = snakeMats[snakeColor];
-            break;
+            case SaLType.Snake:
+                saLname = "Snake";
+                int snakeColor = Random.Range(0,4);
+                chosenPrefab = length switch
+                {
+                    2 => snake2Prefab,
+                    3 => snake3Prefab,
+                    4 => snake4Prefab,
+                    _ => snake2Prefab
+                };
+                chosenPrefab.GetComponentInChildren<Renderer>().material = snakeMats[snakeColor];
+                break;
 
-        case SaLType.Jam:
-            saLname = "Jam";
-            chosenPrefab = jamPrefab;
-            break;
+            case SaLType.Jam:
+                saLname = "Jam";
+                chosenPrefab = jamPrefab;
+                break;
 
-        case SaLType.Caramel:
-            saLname = "Caramel";
-            chosenPrefab = caramelPrefab;
-            break;
-    }
+            case SaLType.Caramel:
+                saLname = "Caramel";
+                chosenPrefab = caramelPrefab;
+                break;
+        }
 
-    GameObject saLRoot = Instantiate(chosenPrefab, startPos, Quaternion.identity);
-    saLRoot.name = saLname;
-    saLRoot.transform.SetParent(floorManager.transform);
+        GameObject saLRoot = Instantiate(chosenPrefab, startPos, Quaternion.identity);
+        saLRoot.name = saLname;
+        saLRoot.transform.SetParent(floorManager.transform);
 
         switch(placingType)
         {
