@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 02164a6d3c712484a80b986bbc60bff3, type: 2}
+    - target: {fileID: -5754084199372789682, guid: c1c4d4c269ffe4d42a4c068f6b7b4eb8, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -8360756210657937650, guid: 7cb6fe6e73a6fea4f89091656acf7e63, type: 3}
     - target: {fileID: 919132149155446097, guid: c1c4d4c269ffe4d42a4c068f6b7b4eb8, type: 3}
       propertyPath: m_Name
       value: Jam
