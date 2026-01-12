@@ -359,7 +359,10 @@ public class PlayerActions : MonoBehaviour
                         moveSaL = true;
                         break;
                     case 4:
-                        gameManager.SnapPlayerToTile(player,player.GetComponent<PlayerStats>().currentPos - 2);
+                        StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos - 2));
+                        break;
+                    case 5:
+                        StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos + 2));
                         break;
                 }
             }

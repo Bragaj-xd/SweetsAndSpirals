@@ -4,6 +4,7 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public TextMeshProUGUI winScreenText;
+
     public GameObject winScreen;
     public TextMeshProUGUI playerToMoveText;
     public GameObject rollThree;
@@ -21,7 +22,7 @@ public class UIManager : MonoBehaviour
         {
             rollThree.SetActive(false);
         }
-        
+
         
     }
 
@@ -54,6 +55,11 @@ public class UIManager : MonoBehaviour
     void UpdatePlayerToMove()
     {
         playerToMoveText.text = gameManager.players[gameManager.playerToMove].name + "'s Turn";
+    }
+
+    void UpdateCardTexts()
+    {
+
     }
 
     public void RollThree()

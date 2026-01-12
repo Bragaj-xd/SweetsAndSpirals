@@ -58,7 +58,10 @@ public class GameManager : MonoBehaviour
     public GameObject cardPrefab;
     public bool rolledThree;
     public GameObject rollThree;
-    
+    public GameObject cardPos;
+    public GameObject cardPosDiscard;
+    public TextMeshProUGUI cardName;
+    public TextMeshProUGUI cardText;
     
     public List<string> playerPositionNames = new List<string>()
             {
@@ -85,6 +88,14 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("GameManager: Red or Blue player not assigned!");
             return;
+        }
+        if(cardText != null)
+        {
+            cardText.gameObject.SetActive(false);
+        }
+        if(cardName != null)
+        {
+            cardName.gameObject.SetActive(false);
         }
 
         // Find starting tile (ID = 0)
@@ -198,14 +209,46 @@ public class GameManager : MonoBehaviour
     
     int PickRandomCard()
     {
-        return Random.Range(0,4);
+        return Random.Range(0,6);
     }
     GameObject SpawnCard()
     {
-        Vector3 pos = new Vector3(-2.5f, 9.7f);
-        GameObject newCard = Instantiate(cardPrefab, pos, Quaternion.identity, transform);
+        GameObject newCard = Instantiate(cardPrefab, cardPos.transform.position, Quaternion.identity, transform);
         newCard.name = "Card";
         newCard.GetComponent<CardStats>().cardId = PickRandomCard();
+        switch(newCard.GetComponent<CardStats>().cardId)
+        {
+            case 0:
+                cardName.text = "Poki Ladder";
+                cardText.text = "Place a Ladder on board to create a shortcut. Move it with mouse and rotate with Scroll Wheel.";
+                break;
+            case 1:
+                cardName.text = "Sour Snake";
+                cardText.text = "Place a Snake on board to create an obstacle. Move it with mouse and rotate with Scroll Wheel.";
+                break;
+            case 2:
+                cardName.text = "Slowing Jam";
+                cardText.text = "Place a Jam on board. Slows movement of players by one for two rounds.";
+                break;
+            case 3:
+                cardName.text = "Sticky Caramel";
+                cardText.text = "Place a Caramel on board. Stops player for one round.";
+                break;
+            case 4:
+                cardName.text = "Forgetful";
+                cardText.text = "You forgot some of your sweets somewhere on the road. Move two places black.";
+                break;
+            case 5:
+                cardName.text = "Sweet Rush";
+                cardText.text = "After eating candies, you are full of energy. Move two places forward.";
+                break;
+        }         
+
+        cardName.gameObject.SetActive(true);
+        cardText.gameObject.SetActive(true);
+
+        StartCoroutine(MoveCardToDiscard(newCard, 5f));
+        
 
         return newCard;
     }
@@ -234,10 +277,14 @@ public class GameManager : MonoBehaviour
     }
 
     // main coroutine: moves player tile-by-tile from currentPos -> destinationID (inclusive)
-    IEnumerator MovePlayerTileByTile(GameObject player, int destinationID)
+    public IEnumerator MovePlayerTileByTile(GameObject player, int destinationID)
     {
         isMoving = true;
-
+        destinationID = Mathf.Clamp(
+            destinationID,
+            0,
+            floorManager.MaxTileID
+        );
         PlayerStats stats = player.GetComponent<PlayerStats>();
         if (stats == null)
         {
@@ -400,6 +447,21 @@ public class GameManager : MonoBehaviour
             // small delay between segment steps
             yield return new WaitForSeconds(0.15f);
         }
+    }
+
+    IEnumerator MoveCardToDiscard(GameObject card, float delay)
+    {
+        if (card == null)
+            yield break;
+
+        yield return new WaitForSeconds(delay);
+        cardName.gameObject.SetActive(false);
+        cardText.gameObject.SetActive(false);
+
+        if (card == null)
+            yield break;
+
+        card.transform.position = cardPosDiscard.transform.position;
     }
 
 }
