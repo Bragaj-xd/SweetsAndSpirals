@@ -25,6 +25,8 @@ using UnityEngine.UI;
                 - add card bundle
                 - add card shuffling
 
+                - cards to keep
+
         -------------------
             SaL spawning
         -------------------
@@ -68,7 +70,7 @@ public class GameManager : MonoBehaviour
                 "Green Position",
                 "Yellow Position"
             };
-    private bool isMoving = false;
+    public bool isMoving = false;
 
 
     private int lastWheelNum = 0;

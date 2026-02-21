@@ -1853,6 +1853,7 @@ GameObject:
   m_Component:
   - component: {fileID: 933672110}
   - component: {fileID: 933672109}
+  - component: {fileID: 933672111}
   m_Layer: 0
   m_Name: UIManager
   m_TagString: UIManager
@@ -1896,6 +1897,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &933672111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 933672108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76381f9f65e99124aa77ad70454050ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CamTest
+  gameManager: {fileID: 1113944631}
+  mainCamera: {fileID: 330585545}
 --- !u!4 &938286295 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1587112376572151417, guid: 4f331484394b7754e9837cae18864bce, type: 3}
@@ -2392,6 +2407,7 @@ MonoBehaviour:
   - Blue Position
   - Green Position
   - Yellow Position
+  isMoving: 0
 --- !u!114 &1113944633
 MonoBehaviour:
   m_ObjectHideFlags: 0
