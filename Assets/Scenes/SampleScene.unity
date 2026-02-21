@@ -127,6 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8509981636928148259, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: characterSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 79550de8f6e45984aaca86cdf404af40, type: 3}
     - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 0
@@ -1874,7 +1878,9 @@ MonoBehaviour:
   rollThree: {fileID: 1019989721}
   gameManager: {fileID: 1113944631}
   floorManager: {fileID: 1168863199}
-  player: {fileID: 0}
+  player: {fileID: 1254430823}
+  playerToMoveBackground: {fileID: 1254430823}
+  mainCamera: {fileID: 0}
 --- !u!4 &933672110
 Transform:
   m_ObjectHideFlags: 0
@@ -2580,6 +2586,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8509981636928148259, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: characterSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: bed2261ed110ea447b6f89d618d8f136, type: 3}
     - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 0
@@ -3514,6 +3524,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8509981636928148259, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: characterSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: a6e0865176ddf594882bdee9f4ce7142, type: 3}
     - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 0
@@ -4409,6 +4423,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8509981636928148259, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: characterSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 7605a3f8d589d6443bb72f7ccc5dc5c8, type: 3}
     - target: {fileID: -1822204231326384453, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_DefaultActionMap
       value: d6ff91ea-71ed-4e2d-9984-d1be3cc5998e
@@ -4737,9 +4755,9 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 7148789666552518120}
+  - {fileID: 1814474929}
   - {fileID: 57931740}
   - {fileID: 1289879202}
-  - {fileID: 1814474929}
   - {fileID: 750189701}
   - {fileID: 9007818941007433859}
   - {fileID: 646455503}

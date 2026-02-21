@@ -13,8 +13,11 @@ using UnityEngine.UI;
     ---------------------
             Fixes
         -------------------
-                - fix player position after moving from SaL
-
+                - fix player position after moving from SaL (asi?)
+        -------------------
+            Player Actions
+        -------------------
+                - if step on player, move that player back one tile
         -------------------
             Cards
         -------------------
@@ -25,18 +28,13 @@ using UnityEngine.UI;
         -------------------
             SaL spawning
         -------------------
-                - 5 locked states from start
-                - snakes, ladders - cap to tiles
-                - add chance cards spawns
+                - pre game SaL placement phase
                 
         -------------------
             UI
         -------------------
                 - updated UI (graphics shit)
-        -------------------
-            Graphics
-        -------------------
-                - snakes
+                - Dynamic Camera
         -------------------
             Multiplayer
         -------------------

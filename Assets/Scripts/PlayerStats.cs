@@ -8,6 +8,7 @@ public class PlayerStats : MonoBehaviour
     public bool caramelInUse;
     public int jamInUse;
     public bool skipNextTurn;
+    public Sprite characterSprite;
 
     
 

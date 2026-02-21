@@ -1,5 +1,7 @@
+using Microsoft.Unity.VisualStudio.Editor;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -11,6 +13,9 @@ public class UIManager : MonoBehaviour
     public GameManager gameManager;
     public FloorManager floorManager;
     public GameObject player;
+    public GameObject playerToMoveBackground;
+
+    public Camera mainCamera;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -55,7 +60,7 @@ public class UIManager : MonoBehaviour
     void UpdatePlayerToMove()
     {
         playerToMoveText.text = gameManager.players[gameManager.playerToMove].name + "'s Turn";
-    }
+        playerToMoveBackground.GetComponent<UnityEngine.UI.Image>().sprite = player.GetComponent<PlayerStats>().characterSprite;   }
 
     void UpdateCardTexts()
     {

@@ -112,6 +112,11 @@ public class PlayerActions : MonoBehaviour
 
         if (moveSaL)
         {
+            if(floorManager.FindTileByID(startTileID).tileFunction != 0 || floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction != 0)
+            {
+                Debug.Log("Can't place here!");
+                return;
+            }
             moveSaL = false;
             Debug.Log("SaL placement finished");
             // Finalize this SaL
