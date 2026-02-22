@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour
     public GameObject cardPosDiscard;
     public TextMeshProUGUI cardName;
     public TextMeshProUGUI cardText;
+    public GameObject wheel;
     
     public List<string> playerPositionNames = new List<string>()
             {

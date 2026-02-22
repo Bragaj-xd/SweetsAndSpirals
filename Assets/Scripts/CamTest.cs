@@ -33,7 +33,7 @@ public class CamTest : MonoBehaviour {
     }
     
     void Update() {
-
+        
         if (gameManager.activePlayer != null && camFollowPlayer) {
 
             // when movement starts, capture target once and lock it until movement ends

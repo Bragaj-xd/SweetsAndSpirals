@@ -106,47 +106,60 @@ public class PlayerActions : MonoBehaviour
 
     public void LeftMouseButton(InputAction.CallbackContext context)
     {
-        if (!context.performed)
-            return;
-
-
-        if (moveSaL)
+        if(gameManager.activePlayer == player)
         {
-            if(floorManager.FindTileByID(startTileID).tileFunction != 0 || floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction != 0)
-            {
-                Debug.Log("Can't place here!");
+            if (!context.performed)
                 return;
-            }
-            moveSaL = false;
-            Debug.Log("SaL placement finished");
-            // Finalize this SaL
-            if(saLPreviewScript)
-                saLPreviewScript.UpdateEndTile();
-            switch(placingType)
+
+
+            if (moveSaL)
             {
-                case SaLType.Ladder:
-                    floorManager.FindTileByID(startTileID).tileFunction = 1;
-                    floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 2;
-                    break;
-                case SaLType.Snake:
-                    floorManager.FindTileByID(startTileID).tileFunction = 3;
-                    floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 4;
-                    break;
-                case SaLType.Jam:
-                    floorManager.FindTileByID(startTileID).tileFunction = 5;
-                    break;
-                case SaLType.Caramel:
-                    floorManager.FindTileByID(startTileID).tileFunction = 6;
-                    break;
+                if(floorManager.FindTileByID(startTileID).tileFunction != 0 || floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction != 0)
+                {
+                    Debug.Log("Can't place here!");
+                    return;
+                }
+                moveSaL = false;
+                Debug.Log("SaL placement finished");
+                // Finalize this SaL
+                if(saLPreviewScript)
+                    saLPreviewScript.UpdateEndTile();
+                switch(placingType)
+                {
+                    case SaLType.Ladder: 
+                        floorManager.FindTileByID(startTileID).tileFunction = 1;
+                        floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 2;
+                        break;
+                    case SaLType.Snake:
+                        floorManager.FindTileByID(startTileID).tileFunction = 3;
+                        floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 4;
+                        break;
+                    case SaLType.Jam:
+                        floorManager.FindTileByID(startTileID).tileFunction = 5;
+                        break;
+                    case SaLType.Caramel:
+                        floorManager.FindTileByID(startTileID).tileFunction = 6;
+                        break;
+                }
+                Debug.Log(rollTheDice);
+                if(!rollTheDice.interactable)
+                    rollTheDice.interactable = true;
+                saLPreview = null;
+                saLPreviewScript = null;
+                gameManager.playerToMove = (gameManager.playerToMove + 1) % gameManager.players.Count;
+                
+            }   
+            else
+            {
+                RaycastHit hitInfo = new RaycastHit();
+                if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo) && hitInfo.transform.gameObject == gameManager.wheel)
+                {
+                    diceRoll.SpinTheWheel();
+                    Debug.Log("wheel spun");
+                }
             }
-            Debug.Log(rollTheDice);
-            if(!rollTheDice.interactable)
-                rollTheDice.interactable = true;
-            saLPreview = null;
-            saLPreviewScript = null;
-            gameManager.playerToMove = (gameManager.playerToMove + 1) % gameManager.players.Count;
-            
-        }   
+        }
+        
     }
 
     public void ScrollWheel(InputAction.CallbackContext context)
@@ -162,6 +175,12 @@ public class PlayerActions : MonoBehaviour
             Application.Quit();
             
         }
+
+        if (Input.GetMouseButtonDown(0))
+    	{
+        	
+    	}
+        
         if(moveSaL)
         {
             MoveSaL();
