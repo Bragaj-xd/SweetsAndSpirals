@@ -36,7 +36,6 @@ using UnityEngine.UI;
             UI
         -------------------
                 - updated UI (graphics shit)
-                - Dynamic Camera
         -------------------
             Multiplayer
         -------------------
@@ -59,10 +58,10 @@ public class GameManager : MonoBehaviour
     public bool rolledThree;
     public GameObject rollThree;
     public GameObject cardPos;
-    public GameObject cardPosDiscard;
     public TextMeshProUGUI cardName;
     public TextMeshProUGUI cardText;
     public GameObject wheel;
+    public GameObject cardPosDiscard;
     
     public List<string> playerPositionNames = new List<string>()
             {
@@ -220,37 +219,39 @@ public class GameManager : MonoBehaviour
         switch(newCard.GetComponent<CardStats>().cardId)
         {
             case 0:
-                cardName.text = "Poki Ladder";
-                cardText.text = "Place a Ladder on board to create a shortcut. Move it with mouse and rotate with Scroll Wheel.";
+                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Poki Ladder";
+                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "Place a Ladder on board to create a shortcut. Move it with mouse and rotate with Scroll Wheel.";
+                
                 break;
             case 1:
-                cardName.text = "Sour Snake";
-                cardText.text = "Place a Snake on board to create an obstacle. Move it with mouse and rotate with Scroll Wheel.";
+                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Sour Snake";
+                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "Place a Snake on board to create an obstacle. Move it with mouse and rotate with Scroll Wheel.";
+                
                 break;
             case 2:
-                cardName.text = "Slowing Jam";
-                cardText.text = "Place a Jam on board. Slows movement of players by one for two rounds.";
+                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Slowing Jam";
+                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "Place a Jam on board. Slows movement of players by one for two rounds.";
+                
                 break;
             case 3:
-                cardName.text = "Sticky Caramel";
-                cardText.text = "Place a Caramel on board. Stops player for one round.";
+                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Sticky Caramel";
+                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "Place a Caramel on board. Stops player for one round.";
+                
                 break;
             case 4:
-                cardName.text = "Forgetful";
-                cardText.text = "You forgot some of your sweets somewhere on the road. Move two places black.";
+                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Forgetful";
+                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "You forgot some of your sweets somewhere on the road. Move two places black.";
+                newCard.GetComponent<CardStats>().instantUse = true;
+                
                 break;
             case 5:
-                cardName.text = "Sweet Rush";
-                cardText.text = "After eating candies, you are full of energy. Move two places forward.";
+                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Sweet Rush";
+                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "After eating candies, you are full of energy. Move two places forward.";
+                newCard.GetComponent<CardStats>().instantUse = true;
+                
                 break;
         }         
-
-        cardName.gameObject.SetActive(true);
-        cardText.gameObject.SetActive(true);
-
-        StartCoroutine(MoveCardToDiscard(newCard, 5f));
         
-
         return newCard;
     }
     Transform GetMarkerForPlayer(Tile tile, GameObject player)
@@ -450,20 +451,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    IEnumerator MoveCardToDiscard(GameObject card, float delay)
-    {
-        if (card == null)
-            yield break;
-
-        yield return new WaitForSeconds(delay);
-        cardName.gameObject.SetActive(false);
-        cardText.gameObject.SetActive(false);
-
-        if (card == null)
-            yield break;
-
-        card.transform.position = cardPosDiscard.transform.position;
-    }
+    
 
 }
 
