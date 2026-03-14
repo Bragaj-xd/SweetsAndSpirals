@@ -22,7 +22,7 @@ public class FloorManager : MonoBehaviour
     public List<GameObject> snakes = new List<GameObject>();
     public List<GameObject> jams = new List<GameObject>();
     public List<GameObject> caramels = new List<GameObject>();
-    public List<int> ChanceCardId = new List<int> { 6,12,16,25,29,37,43,55,67,74,82,90 };
+    public List<int> ChanceCardId = new List<int> { 6,12,16,20,29,37,43,55,67,71,82,90};
 
     void Awake()
     {

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1228859535986522560}
   - component: {fileID: -8305058294829829371}
   m_Layer: 0
-  m_Name: Card Face Up
+  m_Name: Card 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48,10 +48,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 746f69d76725e5542bcb67eaea4008b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardStats
-  cardId: 0
-  instantUse: 0
-  cardName: 
-  cardText: 
+  cardId: 4
+  instantUse: 1
+  cardName: Forgetful
+  cardText: You forgot some of your sweets somewhere on the road. Move two places
+    black.
 --- !u!65 &-8305058294829829371
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1228859535986522560}
   - component: {fileID: -8305058294829829371}
   m_Layer: 0
-  m_Name: Card Face Up
+  m_Name: Card
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50,8 +50,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardStats
   cardId: 0
   instantUse: 0
-  cardName: 
-  cardText: 
+  cardName: Poki Ladder
+  cardText: Place a Ladder on board to create a shortcut. Move it with mouse and
+    rotate with Scroll Wheel.
 --- !u!65 &-8305058294829829371
 BoxCollider:
   m_ObjectHideFlags: 0

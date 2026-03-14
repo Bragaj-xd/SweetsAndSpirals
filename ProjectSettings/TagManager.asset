@@ -12,6 +12,7 @@ TagManager:
   - CardHolder
   - CardName
   - CardText
+  - CardPos
   layers:
   - Default
   - TransparentFX

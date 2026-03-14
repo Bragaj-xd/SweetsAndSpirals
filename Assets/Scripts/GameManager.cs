@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI cardText;
     public GameObject wheel;
     public GameObject cardPosDiscard;
+    public List<GameObject> cardPrefabs;
     
     public List<string> playerPositionNames = new List<string>()
             {
@@ -213,44 +214,11 @@ public class GameManager : MonoBehaviour
     }
     GameObject SpawnCard()
     {
-        GameObject newCard = Instantiate(cardPrefab, cardPos.transform.position, Quaternion.identity, transform);
-        newCard.name = "Card";
-        newCard.GetComponent<CardStats>().cardId = PickRandomCard();
-        switch(newCard.GetComponent<CardStats>().cardId)
-        {
-            case 0:
-                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Poki Ladder";
-                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "Place a Ladder on board to create a shortcut. Move it with mouse and rotate with Scroll Wheel.";
-                
-                break;
-            case 1:
-                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Sour Snake";
-                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "Place a Snake on board to create an obstacle. Move it with mouse and rotate with Scroll Wheel.";
-                
-                break;
-            case 2:
-                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Slowing Jam";
-                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "Place a Jam on board. Slows movement of players by one for two rounds.";
-                
-                break;
-            case 3:
-                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Sticky Caramel";
-                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "Place a Caramel on board. Stops player for one round.";
-                
-                break;
-            case 4:
-                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Forgetful";
-                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "You forgot some of your sweets somewhere on the road. Move two places black.";
-                newCard.GetComponent<CardStats>().instantUse = true;
-                
-                break;
-            case 5:
-                newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = "Sweet Rush";
-                newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = "After eating candies, you are full of energy. Move two places forward.";
-                newCard.GetComponent<CardStats>().instantUse = true;
-                
-                break;
-        }         
+        cardPrefab = cardPrefabs[PickRandomCard()];
+        GameObject newCard = Instantiate(cardPrefab, cardPos.transform.position, cardPos.transform.rotation, transform);
+
+        newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = cardPrefab.GetComponent<CardStats>().cardName;
+        newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = cardPrefab.GetComponent<CardStats>().cardText;        
         
         return newCard;
     }
