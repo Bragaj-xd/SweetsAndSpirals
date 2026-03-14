@@ -32,8 +32,12 @@ public class PlayerActions : MonoBehaviour
     public GameObject startTile;
     public DiceRoll diceRoll;
     public int startTileID;
+    public GameObject cardPosDiscard;
+
+    public GameObject cardHolder;
 
     Vector2 scrollInput;
+    bool leftMouseHeld = false;
 
     int directionIndex = 0;
 
@@ -89,6 +93,8 @@ public class PlayerActions : MonoBehaviour
         floorManager = GameObject.FindGameObjectWithTag("FloorManager").GetComponent<FloorManager>();
         diceRoll = GameObject.FindGameObjectWithTag("GameManager").GetComponent<DiceRoll>();
         rollTheDice = gameManager.rollTheDice;
+        cardHolder = GameObject.FindGameObjectWithTag("CardHolder");
+        cardPosDiscard = gameManager.cardPosDiscard;
     }
 
     //public void OnMenu(InputAction.CallbackContext context) => inputMenu = context.ReadValueAsButton();
@@ -106,47 +112,105 @@ public class PlayerActions : MonoBehaviour
 
     public void LeftMouseButton(InputAction.CallbackContext context)
     {
-        if (!context.performed)
-            return;
-
-
-        if (moveSaL)
+        if(gameManager.activePlayer == player)
         {
-            if(floorManager.FindTileByID(startTileID).tileFunction != 0 || floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction != 0)
-            {
-                Debug.Log("Can't place here!");
+            if (!context.performed)
                 return;
-            }
-            moveSaL = false;
-            Debug.Log("SaL placement finished");
-            // Finalize this SaL
-            if(saLPreviewScript)
-                saLPreviewScript.UpdateEndTile();
-            switch(placingType)
-            {
-                case SaLType.Ladder:
-                    floorManager.FindTileByID(startTileID).tileFunction = 1;
-                    floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 2;
-                    break;
-                case SaLType.Snake:
-                    floorManager.FindTileByID(startTileID).tileFunction = 3;
-                    floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 4;
-                    break;
-                case SaLType.Jam:
-                    floorManager.FindTileByID(startTileID).tileFunction = 5;
-                    break;
-                case SaLType.Caramel:
-                    floorManager.FindTileByID(startTileID).tileFunction = 6;
-                    break;
-            }
-            Debug.Log(rollTheDice);
-            if(!rollTheDice.interactable)
-                rollTheDice.interactable = true;
-            saLPreview = null;
-            saLPreviewScript = null;
-            gameManager.playerToMove = (gameManager.playerToMove + 1) % gameManager.players.Count;
+
+            if (context.started) leftMouseHeld = true;
+            if (context.canceled) leftMouseHeld = false;
+
             
-        }   
+            if (moveSaL)
+            {
+                if(floorManager.FindTileByID(startTileID).tileFunction != 0 || floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction != 0)
+                {
+                    Debug.Log("Can't place here!");
+                    return;
+                }
+                moveSaL = false;
+                Debug.Log("SaL placement finished");
+                // Finalize this SaL
+                if(saLPreviewScript)
+                    saLPreviewScript.UpdateEndTile();
+                switch(placingType)
+                {
+                    case SaLType.Ladder: 
+                        floorManager.FindTileByID(startTileID).tileFunction = 1;
+                        floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 2;
+                        break;
+                    case SaLType.Snake:
+                        floorManager.FindTileByID(startTileID).tileFunction = 3;
+                        floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction = 4;
+                        break;
+                    case SaLType.Jam:
+                        floorManager.FindTileByID(startTileID).tileFunction = 5;
+                        break;
+                    case SaLType.Caramel:
+                        floorManager.FindTileByID(startTileID).tileFunction = 6;
+                        break;
+                }
+                Debug.Log(rollTheDice);
+                if(!rollTheDice.interactable)
+                    rollTheDice.interactable = true;
+                saLPreview = null;
+                saLPreviewScript = null;
+                gameManager.playerToMove = (gameManager.playerToMove + 1) % gameManager.players.Count;
+                
+            }   
+            else
+            {
+                RaycastHit hitInfo = new RaycastHit();
+                if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo) && hitInfo.transform.gameObject == gameManager.wheel)
+                {
+                    diceRoll.SpinTheWheel();
+                    Debug.Log("wheel spun");
+                }
+                
+                List<GameObject> cardsToRemove = new List<GameObject>();
+
+                foreach(GameObject card in playerStats.cards)
+                {
+                    if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo) && hitInfo.transform.gameObject == card)
+                    {
+                        Debug.Log("Card clicked: " + card.name);
+                        CardStats stats = card.GetComponent<CardStats>();
+                        switch(stats.cardId)
+                        {
+                            case 0:
+                                card.transform.position = cardHolder.transform.position; // Move card to card holder
+                                placingType = SaLType.Ladder;
+                                moveSaL = true;
+
+                                break;
+                            case 1:
+                                card.transform.position = cardHolder.transform.position; // Move card to card holder
+                                placingType = SaLType.Snake;
+                                moveSaL = true;
+                                break;
+                            case 2:
+                                card.transform.position = cardHolder.transform.position; // Move card to card holder
+                                placingType = SaLType.Jam;
+                                moveSaL = true;
+                                break;
+                            case 3:
+                                card.transform.position = cardHolder.transform.position; // Move card to card holder
+                                placingType = SaLType.Caramel;
+                                moveSaL = true;
+                                break;
+                        }
+                        cardsToRemove.Add(card);
+                        card.transform.position = cardPosDiscard.transform.position;
+                        
+                    }
+                }
+                foreach (GameObject card in cardsToRemove)
+                {
+                    playerStats.cards.Remove(card);
+                }
+            }
+        }
+        
     }
 
     public void ScrollWheel(InputAction.CallbackContext context)
@@ -162,11 +226,39 @@ public class PlayerActions : MonoBehaviour
             Application.Quit();
             
         }
+
+        
         if(moveSaL)
         {
             MoveSaL();
         }
 
+        if (gameManager.activePlayer == player)
+        {
+            // first disable any card that is currently attached to the holder
+            // (we only care about cards that are *children* of the holder,
+            //  not the card's own transform, which is what GetComponentInParent
+            //  was returning previously).
+            foreach (GameObject scanPlayer in gameManager.players)
+            {
+                foreach (GameObject card in scanPlayer.GetComponent<PlayerStats>().cards)
+                {
+                    if (card.transform.IsChildOf(cardHolder.transform) && card.activeSelf)
+                    {
+                        card.SetActive(false);
+                    }
+                }
+            }
+
+            // now re‑enable only the active player's cards that are in the holder
+            foreach (GameObject card in playerStats.cards)
+            {
+                if (card.transform.IsChildOf(cardHolder.transform) && !card.activeSelf)
+                {
+                    card.SetActive(true);
+                }
+            }
+        }
     }
     GameObject BuildSaL(Vector3 startPos)
     {
@@ -354,36 +446,110 @@ public class PlayerActions : MonoBehaviour
             gameManager.AddChanceCard(player);
             gameManager.rolledThree = false;
             rollThree.SetActive(false);
+            
+            List<GameObject> cardsToRemove = new List<GameObject>();
+            
             foreach (GameObject card in playerStats.cards)
             {
                 CardStats stats = card.GetComponent<CardStats>();
-                Debug.Log(stats.cardId);
-                switch(stats.cardId)
+                if (stats.instantUse)
                 {
-                    case 0:
-                        placingType = SaLType.Ladder;
-                        moveSaL = true;
-                        break;
-                    case 1:
-                        placingType = SaLType.Snake;
-                        moveSaL = true;
-                        break;
-                    case 2:
-                        placingType = SaLType.Jam;
-                        moveSaL = true;
-                        break;
-                    case 3:
-                        placingType = SaLType.Caramel;
-                        moveSaL = true;
-                        break;
+                    // Handle instant use cards
+                    switch(stats.cardId)
+                    {
+                        case 4:
+                            StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos - 2));
+                            cardsToRemove.Add(card);
+                            break;
+                        case 5:
+                            StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos + 2));
+                            cardsToRemove.Add(card);
+                            break;
+                    }
+                    StartCoroutine(MoveCardToDiscard(card, 5f));
+                }
+                else
+                {
+                    /*
+                    switch(stats.cardId)
+                    {
+                        case 0:
+                            card.transform.position = cardHolder.transform.position; // Move card to card holder
+                            placingType = SaLType.Ladder;
+                            moveSaL = true;
+
+                            break;
+                        case 1:
+                            card.transform.position = cardHolder.transform.position; // Move card to card holder
+                            placingType = SaLType.Snake;
+                            moveSaL = true;
+                            break;
+                        case 2:
+                            card.transform.position = cardHolder.transform.position; // Move card to card holder
+                            placingType = SaLType.Jam;
+                            moveSaL = true;
+                            break;
+                        case 3:
+                            card.transform.position = cardHolder.transform.position; // Move card to card holder
+                            placingType = SaLType.Caramel;
+                            moveSaL = true;
+                            break;
+                    }
+                    */
+                    StartCoroutine(MoveCardToPlayer(card, 5f));
+                
+                    /*
                     case 4:
                         StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos - 2));
                         break;
                     case 5:
                         StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos + 2));
                         break;
+                    */
                 }
             }
+            
+            // Remove cards after loop completes to avoid modifying collection during iteration
+            foreach (GameObject card in cardsToRemove)
+            {
+                playerStats.cards.Remove(card);
+            }
         }
+    }
+    IEnumerator MoveCardToDiscard(GameObject card, float delay)
+    {
+        if (card == null)
+            yield break;
+
+        yield return new WaitForSeconds(delay);
+
+        if (card == null)
+            yield break;
+
+        card.transform.position = cardPosDiscard.transform.position;
+    }
+    IEnumerator MoveCardToPlayer(GameObject card, float delay)
+    {
+        if (card == null)
+            yield break;
+
+        yield return new WaitForSeconds(delay);
+
+        if (card == null)
+            yield break;
+
+        card.transform.position = cardHolder.transform.position;
+        card.transform.SetParent(cardHolder.transform);
+        if(card.transform.localScale.x > 1.8f)
+        {
+            card.transform.localScale = card.transform.localScale/2; //new Vector3(1.7f,0.01f,1.5f);
+        }
+        card.transform.rotation = Quaternion.Euler(0,-90,0);
+        for(int i = 0; i < playerStats.cards.Count; i++)
+        {
+            playerStats.cards[i].transform.localPosition = new Vector3(1.5f * i,0f,0f);
+        }
+        card.SetActive(false);
+        gameManager.playerToMove = (gameManager.playerToMove + 1) % gameManager.players.Count;
     }
 }

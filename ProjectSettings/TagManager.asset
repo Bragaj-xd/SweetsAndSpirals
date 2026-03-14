@@ -9,6 +9,9 @@ TagManager:
   - GameManager
   - UIManager
   - SnakeMesh
+  - CardHolder
+  - CardName
+  - CardText
   layers:
   - Default
   - TransparentFX

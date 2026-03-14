@@ -62,11 +62,11 @@ MonoBehaviour:
       - rid: 8875722340916789253
       - rid: 8875722340916789254
       - rid: 8875722340916789255
-      - rid: 1489907654494257152
-      - rid: 1489907654494257153
-      - rid: 1489907654494257154
-      - rid: 1489907654494257155
-      - rid: 1489907654494257156
+      - rid: 1701415404660064256
+      - rid: 1701415404660064257
+      - rid: 1701415404660064258
+      - rid: 1701415404660064259
+      - rid: 1701415404660064260
     m_RuntimeSettings:
       m_List: []
   m_AssetVersion: 10
@@ -99,7 +99,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1489907654494257152
+    - rid: 1701415404660064256
       type: {class: RayTracingRenderPipelineResources, ns: UnityEngine.Rendering.UnifiedRayTracing, asm: Unity.UnifiedRayTracing.Runtime}
       data:
         m_Version: 1
@@ -123,6 +123,7 @@ MonoBehaviour:
         m_Version: 0
         m_IncludeTerrainShaders: 1
     - rid: 1489907654494257155
+    - rid: 1701415404660064257
       type: {class: UniversalRenderPipelineRuntimeTerrainShaders, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:
         m_Version: 0
@@ -130,10 +131,21 @@ MonoBehaviour:
         m_TerrainDetailGrassBillboard: {fileID: 4800000, guid: 29868e73b638e48ca99a19ea58c48d90, type: 3}
         m_TerrainDetailGrass: {fileID: 4800000, guid: e507fdfead5ca47e8b9a768b51c291a1, type: 3}
     - rid: 1489907654494257156
+    - rid: 1701415404660064258
+      type: {class: URPTerrainShaderSetting, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
+      data:
+        m_Version: 0
+        m_IncludeTerrainShaders: 1
+    - rid: 1701415404660064259
       type: {class: URPReflectionProbeSettings, ns: UnityEngine.Rendering, asm: Unity.RenderPipelines.Universal.Runtime}
       data:
         version: 1
         useReflectionProbeRotation: 0
+    - rid: 1701415404660064260
+      type: {class: OnTilePostProcessResource, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
+      data:
+        m_Version: 0
+        m_UberPostShader: {fileID: 4800000, guid: fe4f13c1004a07d4ea1e30bfd0326d9e, type: 3}
     - rid: 3376993150372675584
       type: {class: UniversalRenderPipelineRuntimeXRResources, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:
