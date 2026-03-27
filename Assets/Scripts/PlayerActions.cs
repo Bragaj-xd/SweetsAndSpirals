@@ -40,6 +40,7 @@ public class PlayerActions : MonoBehaviour
     public GameObject zoomedCard;
 
     Vector2 scrollInput;
+    Vector2 mousePos;
     bool leftMouseHeld = false;
 
     int directionIndex = 0;
@@ -139,6 +140,10 @@ public class PlayerActions : MonoBehaviour
     {
         scrollInput = context.ReadValue<Vector2>();
     }
+    public void MousePosition(InputAction.CallbackContext context)
+    {
+        mousePos = context.ReadValue<Vector2>();
+    }
 
     void Update()
     {
@@ -185,7 +190,7 @@ public class PlayerActions : MonoBehaviour
             // Hover detection for cards
             GameObject currentHovered = null;
             RaycastHit hitInfo = new RaycastHit();
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo))
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfo))
             {
                 GameObject hitObject = hitInfo.transform.gameObject;
                 if (hitObject.transform.IsChildOf(cardHolder.transform))
@@ -480,7 +485,7 @@ public class PlayerActions : MonoBehaviour
         else
         {
             RaycastHit hitInfo = new RaycastHit();
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo) && hitInfo.transform.gameObject == gameManager.wheel)
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfo) && hitInfo.transform.gameObject == gameManager.wheel)
             {
                 diceRoll.SpinTheWheel();
                 Debug.Log("wheel spun");
@@ -490,7 +495,7 @@ public class PlayerActions : MonoBehaviour
 
             foreach(GameObject card in playerStats.cards)
             {
-                if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo) && hitInfo.transform.gameObject == card)
+                if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfo) && hitInfo.transform.gameObject == card)
                 {
                     Debug.Log("Card clicked: " + card.name);
                     CardStats stats = card.GetComponent<CardStats>();

@@ -89,6 +89,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!135 &7393413115231494288
 SphereCollider:
@@ -163,6 +164,7 @@ MonoBehaviour:
   caramelInUse: 0
   jamInUse: 0
   skipNextTurn: 0
+  characterSprite: {fileID: 0}
 --- !u!114 &3647175325378266580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,6 +202,11 @@ MonoBehaviour:
   startTile: {fileID: 0}
   diceRoll: {fileID: 0}
   startTileID: 0
+  cardPosDiscard: {fileID: 0}
+  cardPos: {fileID: 0}
+  cardHolder: {fileID: 0}
+  hoveredCard: {fileID: 0}
+  zoomedCard: {fileID: 0}
 --- !u!114 &-1822204231326384453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,11 +233,35 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3647175325378266580}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: OnMenu
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: a497297e-e891-4411-b32d-e9e1115b62e8
     m_ActionName: 'EndGame/Quit Game[/Keyboard/escape]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3647175325378266580}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: MousePosition
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 4a5d441a-490b-4f4a-823d-145e5a45fc28
     m_ActionName: 'Mouse/MousePos[/Mouse/position]'
   - m_PersistentCalls:
