@@ -177,6 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ba83f1c7b8993b479d570d32901069f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerActions
+  uiManager: {fileID: 0}
   rollTheDice: {fileID: 0}
   gameManager: {fileID: 0}
   floorManager: {fileID: 0}
@@ -233,19 +234,7 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3647175325378266580}
-        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
-        m_MethodName: OnMenu
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_ActionId: a497297e-e891-4411-b32d-e9e1115b62e8
     m_ActionName: 'EndGame/Quit Game[/Keyboard/escape]'
   - m_PersistentCalls:

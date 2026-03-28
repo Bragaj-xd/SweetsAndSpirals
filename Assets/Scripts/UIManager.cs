@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class UIManager : MonoBehaviour
     public FloorManager floorManager;
     public GameObject player;
     public GameObject playerToMoveBackground;
+    //pause menu references
+    public string mainMenuSceneName;
+    public GameObject pauseMenuUI;
 
     public Camera mainCamera;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -61,10 +65,6 @@ public class UIManager : MonoBehaviour
         playerToMoveText.text = gameManager.players[gameManager.playerToMove].name + "'s Turn";
         playerToMoveBackground.GetComponent<UnityEngine.UI.Image>().sprite = player.GetComponent<PlayerStats>().characterSprite;   }
 
-    void UpdateCardTexts()
-    {
-
-    }
 
     public void RollThree()
     {
@@ -75,6 +75,16 @@ public class UIManager : MonoBehaviour
         
     }
 
+    //Pause menu logic
+    void MainMenu()
+    {
+        SceneManager.LoadScene(mainMenuSceneName);
+    }
+    void Continue()
+    {
+        player.GetComponent<PlayerActions>().inputMenu = false;
+        pauseMenuUI.SetActive(false);
+    }
 
 }
 

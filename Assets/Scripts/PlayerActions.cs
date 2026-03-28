@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class PlayerActions : MonoBehaviour
 {
+    public UIManager uiManager;
     public Button rollTheDice;
     public GameManager gameManager;
     public FloorManager floorManager;
@@ -93,6 +94,7 @@ public class PlayerActions : MonoBehaviour
         playerStats = GetComponent<PlayerStats>();
         player = gameObject;
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+        uiManager = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
         rollThree = gameManager.rollThree;
         floorManager = GameObject.FindGameObjectWithTag("FloorManager").GetComponent<FloorManager>();
         diceRoll = GameObject.FindGameObjectWithTag("GameManager").GetComponent<DiceRoll>();
@@ -104,16 +106,22 @@ public class PlayerActions : MonoBehaviour
 
     //public void OnMenu(InputAction.CallbackContext context) => inputMenu = context.ReadValueAsButton();
 
-    public void OnMenu(InputAction.CallbackContext context)
-{
-    if (context.started)
-        inputMenu = true;
-        
+public void OnMenu(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+        {
+            inputMenu = !inputMenu;
+            if (inputMenu)
+            {
+                uiManager.pauseMenuUI.SetActive(true);
+            }
+            else
+            {
+                uiManager.pauseMenuUI.SetActive(false);
+            }
+        }
 
-    if (context.canceled)
-        inputMenu = false;
-
-}
+    }
 
     public void LeftMouseButton(InputAction.CallbackContext context)
     {
