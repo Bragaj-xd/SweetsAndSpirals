@@ -104,8 +104,6 @@ public class PlayerActions : MonoBehaviour
         cardPosDiscard = gameManager.cardPosDiscard;
     }
 
-    //public void OnMenu(InputAction.CallbackContext context) => inputMenu = context.ReadValueAsButton();
-
 public void OnMenu(InputAction.CallbackContext context)
     {
         if(context.performed)

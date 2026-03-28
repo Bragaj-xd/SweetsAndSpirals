@@ -76,11 +76,11 @@ public class UIManager : MonoBehaviour
     }
 
     //Pause menu logic
-    void MainMenu()
+    public void MainMenu()
     {
         SceneManager.LoadScene(mainMenuSceneName);
     }
-    void Continue()
+    public void Continue()
     {
         player.GetComponent<PlayerActions>().inputMenu = false;
         pauseMenuUI.SetActive(false);
