@@ -30,8 +30,10 @@ public class UIManager : MonoBehaviour
         {
             rollThree.SetActive(false);
         }
-
-        
+        if(pauseMenuUI != null)
+        {
+            pauseMenuUI.SetActive(false);
+        }
     }
 
     // Update is called once per frame

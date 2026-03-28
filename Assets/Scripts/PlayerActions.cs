@@ -69,9 +69,7 @@ public class PlayerActions : MonoBehaviour
         Vector3.back, // up
         new Vector3(0.5f,0f,-1f),
         new Vector3(1,0,-1),
-        new Vector3(1,0,-0.5f),
-        
-        
+        new Vector3(1,0,-0.5f)      // right
     };
 
     Vector3[] CurrentDirections =>
@@ -104,7 +102,7 @@ public class PlayerActions : MonoBehaviour
         cardPosDiscard = gameManager.cardPosDiscard;
     }
 
-public void OnMenu(InputAction.CallbackContext context)
+    public void OnMenu(InputAction.CallbackContext context)
     {
         if(context.performed)
         {
@@ -127,19 +125,12 @@ public void OnMenu(InputAction.CallbackContext context)
         {
             if (!context.performed)
                 return;
-
-            if (context.started) leftMouseHeld = true;
-            
-            if (context.canceled) leftMouseHeld = false;
-
-            
+ 
             if(context.performed && !leftMouseHeld)
             {
                 HandleLeftClick();
-            }
-            
+            }   
         }
-        
     }
 
     public void ScrollWheel(InputAction.CallbackContext context)
@@ -153,77 +144,16 @@ public void OnMenu(InputAction.CallbackContext context)
 
     void Update()
     {
-        if(inputMenu)
-        {
-        
-            Application.Quit();
-            
-        }
-
-        
         if(moveSaL)
         {
             MoveSaL();
         }
 
+        ShowActivePlayerCards();
+
         if (gameManager.activePlayer == player)
         {
-            // first disable any card that is currently attached to the holder
-            // (we only care about cards that are *children* of the holder,
-            //  not the card's own transform, which is what GetComponentInParent
-            //  was returning previously).
-
-            foreach (GameObject scanPlayer in gameManager.players)
-            {
-                foreach (GameObject card in scanPlayer.GetComponent<PlayerStats>().cards)
-                {
-                    if (card.transform.IsChildOf(cardHolder.transform) && card.activeSelf)
-                    {
-                        card.SetActive(false);
-                    }
-                }
-            }
-
-            // now re‑enable only the active player's cards that are in the holder
-            foreach (GameObject card in playerStats.cards)
-            {
-                if (card.transform.IsChildOf(cardHolder.transform) && !card.activeSelf)
-                {
-                    card.SetActive(true);
-                }
-            }
-
-            // Hover detection for cards
-            GameObject currentHovered = null;
-            RaycastHit hitInfo = new RaycastHit();
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfo))
-            {
-                GameObject hitObject = hitInfo.transform.gameObject;
-                if (hitObject.transform.IsChildOf(cardHolder.transform))
-                {
-                    currentHovered = hitObject;
-                }
-            }
-
-            if (currentHovered != hoveredCard)
-            {
-                if (hoveredCard != null)
-                {
-                    Debug.Log("Zoomed card created: " + zoomedCard);
-                    zoomedCard.SetActive(false);
-                    hoveredCard = null;
-                    zoomedCard = null;
-                }
-                hoveredCard = currentHovered;
-                if (hoveredCard != null)
-                {
-                    Debug.Log("Hovering over card: " + hoveredCard.name);
-                    hoveredCard.SetActive(true);
-                    zoomedCard = Instantiate(hoveredCard, cardPos.transform.position, cardPos.transform.rotation);
-                    zoomedCard.transform.localScale = hoveredCard.transform.localScale * 2f;
-                    Debug.Log("Zoomed card created: " + zoomedCard.name);
-                }
-            }
+            CardHover();
         }
     }
     GameObject BuildSaL(Vector3 startPos)
@@ -508,29 +438,23 @@ public void OnMenu(InputAction.CallbackContext context)
                     switch(stats.cardId)
                     {
                         case 0:
-                            card.transform.position = cardHolder.transform.position; // Move card to card holder
                             placingType = SaLType.Ladder;
-                            moveSaL = true;
-
                             break;
                         case 1:
-                            card.transform.position = cardHolder.transform.position; // Move card to card holder
                             placingType = SaLType.Snake;
-                            moveSaL = true;
                             break;
                         case 2:
-                            card.transform.position = cardHolder.transform.position; // Move card to card holder
                             placingType = SaLType.Jam;
-                            moveSaL = true;
                             break;
                         case 3:
-                            card.transform.position = cardHolder.transform.position; // Move card to card holder
                             placingType = SaLType.Caramel;
-                            moveSaL = true;
                             break;
                     }
+                    
                     cardsToRemove.Add(card);
                     card.transform.position = cardPosDiscard.transform.position;
+                    moveSaL = true;
+                    
                     
                 }
             }
@@ -576,5 +500,63 @@ public void OnMenu(InputAction.CallbackContext context)
         }
         card.SetActive(false);
         gameManager.playerToMove = (gameManager.playerToMove + 1) % gameManager.players.Count;
+    }
+
+    void ShowActivePlayerCards()
+    {
+        if(player == gameManager.activePlayer)
+        {
+            foreach (GameObject card in player.GetComponent<PlayerStats>().cards)
+            {
+                if (card.transform.IsChildOf(cardHolder.transform))
+                {
+                    card.SetActive(true);
+                }
+            }
+        }
+        else
+        {
+            foreach (GameObject card in player.GetComponent<PlayerStats>().cards)
+            {
+                if (card.transform.IsChildOf(cardHolder.transform))
+                {
+                    card.SetActive(false);
+                }
+            }
+        }
+        
+    }
+    void CardHover()
+    {
+        // Hover detection for cards
+        GameObject currentHovered = null;
+        RaycastHit hitInfo = new RaycastHit();
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfo))
+        {
+            GameObject hitObject = hitInfo.transform.gameObject;
+            if (hitObject.transform.IsChildOf(cardHolder.transform))
+            {
+                currentHovered = hitObject;
+            }
+        }
+
+        if (currentHovered != hoveredCard)
+        {
+            if (hoveredCard != null)
+            {
+                Destroy(zoomedCard);
+                hoveredCard = null;
+                zoomedCard = null;
+            }
+            hoveredCard = currentHovered;
+            if (hoveredCard != null)
+            {
+                Debug.Log("Hovering over card: " + hoveredCard.name);
+                hoveredCard.SetActive(true);
+                zoomedCard = Instantiate(hoveredCard, cardPos.transform.position, cardPos.transform.rotation);
+                zoomedCard.transform.localScale = hoveredCard.transform.localScale * 2f;
+                Debug.Log("Zoomed card created: " + zoomedCard.name);
+            }
+        }
     }
 }
