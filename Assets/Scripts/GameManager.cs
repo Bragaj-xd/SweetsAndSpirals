@@ -218,7 +218,8 @@ public class GameManager : MonoBehaviour
         GameObject newCard = Instantiate(cardPrefab, cardPos.transform.position, cardPos.transform.rotation, transform);
 
         newCard.transform.Find("Card Name").GetComponent<TextMeshPro>().text = cardPrefab.GetComponent<CardStats>().cardName;
-        newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = cardPrefab.GetComponent<CardStats>().cardText;        
+        newCard.transform.Find("Card Text").GetComponent<TextMeshPro>().text = cardPrefab.GetComponent<CardStats>().cardText;
+        newCard.transform.Find("Card Image").GetComponent<Renderer>().material = cardPrefab.GetComponent<CardStats>().cardImage;
         
         return newCard;
     }

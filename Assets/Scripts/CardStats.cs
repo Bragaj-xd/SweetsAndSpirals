@@ -6,4 +6,5 @@ public class CardStats : MonoBehaviour
     public bool instantUse;
     public string cardName;
     public string cardText;
+    public Material cardImage;
 }

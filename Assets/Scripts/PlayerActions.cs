@@ -491,7 +491,7 @@ public class PlayerActions : MonoBehaviour
         card.transform.SetParent(cardHolder.transform);
         if(card.transform.localScale.x > 1.8f)
         {
-            card.transform.localScale = card.transform.localScale/2; //new Vector3(1.7f,0.01f,1.5f);
+            card.transform.localScale = card.transform.localScale/2;
         }
         card.transform.rotation = Quaternion.Euler(-3,-90,0);
         for(int i = 0; i < playerStats.cards.Count; i++)
