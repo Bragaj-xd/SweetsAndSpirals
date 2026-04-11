@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEditor;
 
 public class PlayerActions : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class PlayerActions : MonoBehaviour
     public bool movePlayerForward;
     public bool movePlayerBackward;
     public bool switchPlaces;
+    public bool sendTwoPlayersToStart;
 
     PlayerStats playerStats;
     public GameObject ladder2Prefab;
@@ -379,6 +381,9 @@ public class PlayerActions : MonoBehaviour
                         case 9:
                             switchPlaces = true;
                             break;
+                        case 10:
+                            sendTwoPlayersToStart = true;
+                            break;
                     }
                     cardsToRemove.Add(card);
                     StartCoroutine(MoveCardToDiscard(card, 5f));
@@ -471,6 +476,21 @@ public class PlayerActions : MonoBehaviour
                     StartCoroutine(gameManager.MovePlayerTileByTile(otherPlayer, currentPlayerPos));
 
                     switchPlaces = false;
+                }
+            }
+        }
+        else if(sendTwoPlayersToStart)
+        {
+            RaycastHit hitInfoMovePlayer = new RaycastHit();
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfoMovePlayer))
+            {
+                Debug.Log("Player clicked: " + hitInfoMovePlayer.transform.parent.gameObject.name);
+                if(hitInfoMovePlayer.transform.parent.tag == "Player" && hitInfoMovePlayer.transform.parent.gameObject != player)
+                {
+                    GameObject otherPlayer = hitInfoMovePlayer.transform.parent.gameObject;
+                    StartCoroutine(gameManager.MovePlayerTileByTile(otherPlayer, startTileID));
+                    StartCoroutine(gameManager.MovePlayerTileByTile(player, startTileID));
+                    sendTwoPlayersToStart = false;
                 }
             }
         }
