@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 746f69d76725e5542bcb67eaea4008b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardStats
-  cardId: 715
+  cardId: 17
   instantUse: 1
   cardName: Sweet Rush
   cardText: After eating candies, you are full of energy. Move two places forward.
