@@ -14,6 +14,9 @@ public class PlayerActions : MonoBehaviour
     private GameObject rollThree;
     public bool inputMenu;
     public bool moveSaL;
+    public bool movePlayer;
+    public bool movePlayerForward;
+    public bool movePlayerBackward;
     PlayerStats playerStats;
     public GameObject ladder2Prefab;
     public GameObject ladder3Prefab;
@@ -361,6 +364,16 @@ public class PlayerActions : MonoBehaviour
                             StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos + 2));
                             cardsToRemove.Add(card);
                             break;
+                        case 6: 
+                            movePlayer = true;
+                            movePlayerForward = true;
+                            cardsToRemove.Add(card);
+                            break;
+                        case 7:
+                            movePlayer = true;
+                            movePlayerBackward = true;
+                            cardsToRemove.Add(card);
+                            break;
                     }
                     StartCoroutine(MoveCardToDiscard(card, 5f));
                 }
@@ -417,6 +430,24 @@ public class PlayerActions : MonoBehaviour
             saLPreviewScript = null;
             gameManager.playerToMove = (gameManager.playerToMove + 1) % gameManager.players.Count;
             
+        }
+        else if(movePlayer)
+        {
+            RaycastHit hitInfoMovePlayer = new RaycastHit();
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfoMovePlayer))
+            {
+                Debug.Log("Player clicked: " + hitInfoMovePlayer.transform.parent.gameObject.name);
+                if(hitInfoMovePlayer.transform.parent.tag == "Player")
+                {
+                    if(movePlayerForward)
+                        StartCoroutine(gameManager.MovePlayerTileByTile(hitInfoMovePlayer.transform.parent.gameObject,hitInfoMovePlayer.transform.parent.gameObject.GetComponent<PlayerStats>().currentPos + 2));
+                    else if(movePlayerBackward)
+                        StartCoroutine(gameManager.MovePlayerTileByTile(hitInfoMovePlayer.transform.parent.gameObject,hitInfoMovePlayer.transform.parent.gameObject.GetComponent<PlayerStats>().currentPos - 2));
+                    movePlayer = false;
+                    movePlayerForward = false;
+                    movePlayerBackward = false;
+                }
+            }
         }   
         else
         {

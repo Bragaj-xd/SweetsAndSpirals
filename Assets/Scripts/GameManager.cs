@@ -210,7 +210,8 @@ public class GameManager : MonoBehaviour
     
     int PickRandomCard()
     {
-        return Random.Range(0,6);
+        //return Random.Range(0,7);
+        return  6; // for testing, always pick move player card
     }
     GameObject SpawnCard()
     {
