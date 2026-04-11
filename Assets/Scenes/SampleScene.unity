@@ -2055,6 +2055,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiceRoll
   wheelSpinText: {fileID: 1890434587}
   wheelValue: 0
+  cardWheelValue: 0
   wheelSpun: 0
   mainCamera: {fileID: 330585545}
 --- !u!135 &1002285593
@@ -2540,6 +2541,7 @@ MonoBehaviour:
   - {fileID: 792971568619854985, guid: cabe60e8990820b4b88de9f89917eda1, type: 3}
   - {fileID: 792971568619854985, guid: 582a87f3046e71e428a2f388962573b5, type: 3}
   - {fileID: 792971568619854985, guid: e8b7b6e745567e04da7bd3dbe4db5764, type: 3}
+  - {fileID: 792971568619854985, guid: d091557252aef444eadd524891041722, type: 3}
   playerPositionNames:
   - Red Position
   - Blue Position
@@ -2560,6 +2562,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiceRoll
   wheelSpinText: {fileID: 1890434587}
   wheelValue: 0
+  cardWheelValue: 0
   wheelSpun: 0
   mainCamera: {fileID: 330585545}
 --- !u!1 &1119023272 stripped
