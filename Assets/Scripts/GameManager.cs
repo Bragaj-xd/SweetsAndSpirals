@@ -182,6 +182,11 @@ public class GameManager : MonoBehaviour
                 activePlayer.GetComponent<PlayerStats>().jamInUse -=1;
                 Debug.Log(activePlayer.GetComponent<PlayerStats>().jamInUse);
             }
+        else if(activePlayer.GetComponent<PlayerStats>().moveBackwards)
+            {
+                targetID = currentPlayerPos - diceRoll.wheelValue;
+                activePlayer.GetComponent<PlayerStats>().moveBackwards = false;
+            }
         else
             targetID = currentPlayerPos + diceRoll.wheelValue;
 
@@ -210,8 +215,8 @@ public class GameManager : MonoBehaviour
     
     int PickRandomCard()
     {
-        //return Random.Range(0,7);
-        return  6; // for testing, always pick move player card
+        //return Random.Range(0, cardPrefabs.Count);
+        return  9; // for testing, always pick move player card
     }
     GameObject SpawnCard()
     {
@@ -313,7 +318,10 @@ public class GameManager : MonoBehaviour
         }
 
         // After arrival, handle tile effects (ladders/snakes)
-        yield return StartCoroutine(HandleTileEffects(player, destinationID));
+        if(!stats.ignoreTileEffects)
+            yield return StartCoroutine(HandleTileEffects(player, destinationID));
+        if(stats.ignoreTileEffects)
+            stats.ignoreTileEffects = false;
         isMoving = false;
     }
 

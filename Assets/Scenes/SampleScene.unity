@@ -175,6 +175,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Green
       objectReference: {fileID: 0}
+    - target: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 2758381390278695863, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.1591
@@ -2531,6 +2535,10 @@ MonoBehaviour:
   - {fileID: 792971568619854985, guid: 369e40b70ac50004c8f22f7619a54352, type: 3}
   - {fileID: 792971568619854985, guid: 4901614edd892f74b862a4146bd67b31, type: 3}
   - {fileID: 792971568619854985, guid: 513ebb59d6ddc884c999fc9dd591d83d, type: 3}
+  - {fileID: 792971568619854985, guid: ed3aaed149f32204f8eee5e77629554c, type: 3}
+  - {fileID: 792971568619854985, guid: 466481b512746204395c1adb858d30eb, type: 3}
+  - {fileID: 792971568619854985, guid: cabe60e8990820b4b88de9f89917eda1, type: 3}
+  - {fileID: 792971568619854985, guid: 582a87f3046e71e428a2f388962573b5, type: 3}
   playerPositionNames:
   - Red Position
   - Blue Position
@@ -2833,6 +2841,10 @@ PrefabInstance:
     - target: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_Name
       value: Yellow
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 2758381390278695863, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_LocalScale.x
@@ -4027,6 +4039,10 @@ PrefabInstance:
     - target: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_Name
       value: Blue
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 2758381390278695863, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_LocalScale.x
@@ -5758,6 +5774,10 @@ PrefabInstance:
     - target: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_Name
       value: Red
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483392702695036206, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 2758381390278695863, guid: f616742561e21804bbdbf3c857a63ce2, type: 3}
       propertyPath: m_LocalScale.x
