@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEditor;
 
 public class PlayerActions : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class PlayerActions : MonoBehaviour
     public bool movePlayer;
     public bool movePlayerForward;
     public bool movePlayerBackward;
+    public bool switchPlaces;
+    public bool sendTwoPlayersToStart;
+
     PlayerStats playerStats;
     public GameObject ladder2Prefab;
     public GameObject ladder3Prefab;
@@ -358,29 +362,35 @@ public class PlayerActions : MonoBehaviour
                     {
                         case 4:
                             StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos - 2));
-                            cardsToRemove.Add(card);
                             break;
                         case 5:
                             StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos + 2));
-                            cardsToRemove.Add(card);
                             break;
                         case 6: 
                             movePlayer = true;
                             movePlayerForward = true;
-                            cardsToRemove.Add(card);
                             break;
                         case 7:
                             movePlayer = true;
                             movePlayerBackward = true;
-                            cardsToRemove.Add(card);
+                            
+                            break;
+                        case 8:
+                            playerStats.moveBackwards = true;
+                            break;
+                        case 9:
+                            switchPlaces = true;
+                            break;
+                        case 10:
+                            sendTwoPlayersToStart = true;
                             break;
                     }
+                    cardsToRemove.Add(card);
                     StartCoroutine(MoveCardToDiscard(card, 5f));
                 }
                 else
                 {
                     StartCoroutine(MoveCardToPlayer(card, 5f));
-
                 }
             }
             
@@ -437,7 +447,7 @@ public class PlayerActions : MonoBehaviour
             if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfoMovePlayer))
             {
                 Debug.Log("Player clicked: " + hitInfoMovePlayer.transform.parent.gameObject.name);
-                if(hitInfoMovePlayer.transform.parent.tag == "Player")
+                if(hitInfoMovePlayer.transform.parent.tag == "Player" && hitInfoMovePlayer.transform.parent.gameObject == player)
                 {
                     if(movePlayerForward)
                         StartCoroutine(gameManager.MovePlayerTileByTile(hitInfoMovePlayer.transform.parent.gameObject,hitInfoMovePlayer.transform.parent.gameObject.GetComponent<PlayerStats>().currentPos + 2));
@@ -448,7 +458,42 @@ public class PlayerActions : MonoBehaviour
                     movePlayerBackward = false;
                 }
             }
-        }   
+        }
+        else if(switchPlaces)
+        {
+            RaycastHit hitInfoMovePlayer = new RaycastHit();
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfoMovePlayer))
+            {
+                Debug.Log("Player clicked: " + hitInfoMovePlayer.transform.parent.gameObject.name);
+                if(hitInfoMovePlayer.transform.parent.tag == "Player" && hitInfoMovePlayer.transform.parent.gameObject != player)
+                {
+                    GameObject otherPlayer = hitInfoMovePlayer.transform.parent.gameObject;
+                    int otherPlayerPos = otherPlayer.GetComponent<PlayerStats>().currentPos;
+                    int currentPlayerPos = player.GetComponent<PlayerStats>().currentPos;
+                    otherPlayer.GetComponent<PlayerStats>().ignoreTileEffects = true;
+
+                    StartCoroutine(gameManager.MovePlayerTileByTile(player, otherPlayerPos));
+                    StartCoroutine(gameManager.MovePlayerTileByTile(otherPlayer, currentPlayerPos));
+
+                    switchPlaces = false;
+                }
+            }
+        }
+        else if(sendTwoPlayersToStart)
+        {
+            RaycastHit hitInfoMovePlayer = new RaycastHit();
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfoMovePlayer))
+            {
+                Debug.Log("Player clicked: " + hitInfoMovePlayer.transform.parent.gameObject.name);
+                if(hitInfoMovePlayer.transform.parent.tag == "Player" && hitInfoMovePlayer.transform.parent.gameObject != player)
+                {
+                    GameObject otherPlayer = hitInfoMovePlayer.transform.parent.gameObject;
+                    StartCoroutine(gameManager.MovePlayerTileByTile(otherPlayer, startTileID));
+                    StartCoroutine(gameManager.MovePlayerTileByTile(player, startTileID));
+                    sendTwoPlayersToStart = false;
+                }
+            }
+        }
         else
         {
             RaycastHit hitInfo = new RaycastHit();
