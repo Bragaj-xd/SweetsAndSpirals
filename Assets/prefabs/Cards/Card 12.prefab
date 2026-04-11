@@ -51,8 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardStats
   cardId: 12
   instantUse: 0
-  cardName: Sweet Rush
-  cardText: After eating candies, you are full of energy. Move two places forward.
+  cardName: Reroll your throw
+  cardText: 'You pulled a candy from bag that you did not like. You decide to pull
+    again. Reroll your throw. '
   cardImage: {fileID: 2100000, guid: 96dff19069522ff4291cd4826eaa4bbc, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:

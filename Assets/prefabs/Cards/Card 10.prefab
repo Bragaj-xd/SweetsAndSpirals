@@ -51,8 +51,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardStats
   cardId: 10
   instantUse: 1
-  cardName: Sweet Rush
-  cardText: After eating candies, you are full of energy. Move two places forward.
+  cardName: Return to the start with one opponent
+  cardText: 'You slip on jelly and start falling to the start. Along the way, you
+    get a chance to grab one opponent to fall down with you. Return to the start
+    with one opponent. '
   cardImage: {fileID: 2100000, guid: a1faf33935f0cc747831be4c28d1b63c, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:

@@ -51,8 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardStats
   cardId: 8
   instantUse: 1
-  cardName: Sweet Rush
-  cardText: After eating candies, you are full of energy. Move two places forward.
+  cardName: Your direction of movement changes for one round
+  cardText: 'Oh nooo! The candy you just ate had liquor in it and now your head is
+    spinning. Your direction of movement changes for one round. '
   cardImage: {fileID: 2100000, guid: 0538c29e8dc83ac42b41429aa1857fc2, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:
