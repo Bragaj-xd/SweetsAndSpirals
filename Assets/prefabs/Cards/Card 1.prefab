@@ -54,7 +54,7 @@ MonoBehaviour:
   cardName: Sour Snake
   cardText: Place a Snake on board to create an obstacle. Move it with mouse and
     rotate with Scroll Wheel.
-  cardImage: {fileID: 0}
+  cardImage: {fileID: 2100000, guid: 3c79e805995eccc4ca846ce0468c74b2, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -53,7 +53,7 @@ MonoBehaviour:
   instantUse: 0
   cardName: Sticky Caramel
   cardText: Place a Caramel on board. Stops player for one round.
-  cardImage: {fileID: 2100000, guid: 0ba855c2b240c5b4aa16797b5f678dee, type: 2}
+  cardImage: {fileID: 2100000, guid: 9fe12e7992d739c46ae50fa55a231cc4, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -54,7 +54,7 @@ MonoBehaviour:
   cardName: Forgetful
   cardText: You forgot some of your sweets somewhere on the road. Move two places
     black.
-  cardImage: {fileID: 2100000, guid: 7f1487a34f55d3642968a0e75bfe5a12, type: 2}
+  cardImage: {fileID: 2100000, guid: 9968fc6b4e740f847a234a5a1a150bae, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:
   m_ObjectHideFlags: 0

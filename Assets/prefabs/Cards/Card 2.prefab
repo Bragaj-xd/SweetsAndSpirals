@@ -53,7 +53,7 @@ MonoBehaviour:
   instantUse: 0
   cardName: Slowing Jam
   cardText: Place a Jam on board. Slows movement of players by one for two rounds.
-  cardImage: {fileID: 2100000, guid: 7f1487a34f55d3642968a0e75bfe5a12, type: 2}
+  cardImage: {fileID: 2100000, guid: 77f92e5a4a75d78449d2494c3016132e, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:
   m_ObjectHideFlags: 0

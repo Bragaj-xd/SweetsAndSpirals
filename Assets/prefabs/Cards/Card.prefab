@@ -54,7 +54,7 @@ MonoBehaviour:
   cardName: Poki Ladder
   cardText: Place a Ladder on board to create a shortcut. Move it with mouse and
     rotate with Scroll Wheel.
-  cardImage: {fileID: 2100000, guid: c848710186e5f6741a7a272d0d108ce1, type: 2}
+  cardImage: {fileID: 2100000, guid: 7f1487a34f55d3642968a0e75bfe5a12, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -53,7 +53,7 @@ MonoBehaviour:
   instantUse: 1
   cardName: Sweet Rush
   cardText: After eating candies, you are full of energy. Move two places forward.
-  cardImage: {fileID: 0}
+  cardImage: {fileID: 2100000, guid: 778769138fb42634ba3450caeea38cbb, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:
   m_ObjectHideFlags: 0
