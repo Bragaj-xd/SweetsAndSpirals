@@ -19,7 +19,7 @@ public class DiceRoll : MonoBehaviour
         Debug.Log(wheelSpun);
         //wheelSpinAnimation.Play();
         wheelValue = UnityEngine.Random.Range(1, 7);
-        //wheelValue = 3;     //debug
+        //wheelValue = ;     //debug
         Debug.Log("Rolled: " + wheelValue);
         wheelSpinText.text = wheelValue.ToString();
         wheelSpun++;
