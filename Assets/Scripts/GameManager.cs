@@ -216,7 +216,7 @@ public class GameManager : MonoBehaviour
     int PickRandomCard()
     {
         //return Random.Range(0, cardPrefabs.Count);
-        return  10; // for testing, always pick move player card
+        return  12; // for testing, always pick move player card
     }
     GameObject SpawnCard()
     {
@@ -310,7 +310,18 @@ public class GameManager : MonoBehaviour
             if (id == destinationID)
             {
                 if(tile.tileFunction != 7)
-                    playerToMove = (playerToMove + 1) % players.Count;
+                {
+                    // Check if player has reroll card active
+                    if(!stats.reroll)
+                    {
+                        playerToMove = (playerToMove + 1) % players.Count;
+                    }
+                    else
+                    {
+                        // Player has reroll - will be consumed after tile effects
+                        Debug.Log($"{player.name} gets another roll from reroll card!");
+                    }
+                }
                 
                 break;
             }
@@ -322,6 +333,14 @@ public class GameManager : MonoBehaviour
             yield return StartCoroutine(HandleTileEffects(player, destinationID));
         if(stats.ignoreTileEffects)
             stats.ignoreTileEffects = false;
+        
+        // Re-enable button if player has reroll
+        if(stats.reroll)
+        {
+            rollTheDice.interactable = true;
+            stats.reroll = false;
+        }
+        
         isMoving = false;
     }
 

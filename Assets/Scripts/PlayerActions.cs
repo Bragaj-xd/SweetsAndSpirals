@@ -21,6 +21,7 @@ public class PlayerActions : MonoBehaviour
     public bool switchPlaces;
     public bool sendTwoPlayersToStart;
     public bool sendPlayerToStart;
+    public bool reroll;
 
     PlayerStats playerStats;
     public GameObject ladder2Prefab;
@@ -502,21 +503,28 @@ public class PlayerActions : MonoBehaviour
                     {
                         case 0:
                             placingType = SaLType.Ladder;
+                            moveSaL = true;
                             break;
                         case 1:
                             placingType = SaLType.Snake;
+                            moveSaL = true;
                             break;
                         case 2:
                             placingType = SaLType.Jam;
+                            moveSaL = true;
                             break;
                         case 3:
                             placingType = SaLType.Caramel;
+                            moveSaL = true;
+                            break;
+                        case 12:
+                            player.GetComponent<PlayerStats>().reroll = true;
                             break;
                     }
                     
                     cardsToRemove.Add(card);
                     card.transform.position = cardPosDiscard.transform.position;
-                    moveSaL = true;
+                    
                     
                     
                 }

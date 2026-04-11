@@ -11,6 +11,7 @@ public class PlayerStats : MonoBehaviour
     public bool moveBackwards;
     public Sprite characterSprite;
     public bool ignoreTileEffects;
+    public bool reroll;
     
 
 }
