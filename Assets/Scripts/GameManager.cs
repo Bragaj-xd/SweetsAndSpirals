@@ -215,8 +215,8 @@ public class GameManager : MonoBehaviour
     
     int PickRandomCard()
     {
-        //return Random.Range(0, cardPrefabs.Count);
-        return  12; // for testing, always pick move player card
+        return Random.Range(0, cardPrefabs.Count);
+        //return  12; // for testing, always pick move player card
     }
     GameObject SpawnCard()
     {
