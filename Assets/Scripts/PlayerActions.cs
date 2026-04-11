@@ -20,6 +20,7 @@ public class PlayerActions : MonoBehaviour
     public bool movePlayerBackward;
     public bool switchPlaces;
     public bool sendTwoPlayersToStart;
+    public bool sendPlayerToStart;
 
     PlayerStats playerStats;
     public GameObject ladder2Prefab;
@@ -357,36 +358,8 @@ public class PlayerActions : MonoBehaviour
                 CardStats stats = card.GetComponent<CardStats>();
                 if (stats.instantUse)
                 {
-                    // Handle instant use cards
-                    switch(stats.cardId)
-                    {
-                        case 4:
-                            StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos - 2));
-                            break;
-                        case 5:
-                            StartCoroutine(gameManager.MovePlayerTileByTile(player,player.GetComponent<PlayerStats>().currentPos + 2));
-                            break;
-                        case 6: 
-                            movePlayer = true;
-                            movePlayerForward = true;
-                            break;
-                        case 7:
-                            movePlayer = true;
-                            movePlayerBackward = true;
-                            
-                            break;
-                        case 8:
-                            playerStats.moveBackwards = true;
-                            break;
-                        case 9:
-                            switchPlaces = true;
-                            break;
-                        case 10:
-                            sendTwoPlayersToStart = true;
-                            break;
-                    }
                     cardsToRemove.Add(card);
-                    StartCoroutine(MoveCardToDiscard(card, 5f));
+                    StartCoroutine(MoveCardToDiscardWithEffect(card, stats.cardId));
                 }
                 else
                 {
@@ -494,6 +467,20 @@ public class PlayerActions : MonoBehaviour
                 }
             }
         }
+        if(sendPlayerToStart)
+        {             
+            Debug.Log("Waiting for player click to send to start");
+            RaycastHit hitInfoMovePlayer = new RaycastHit();
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfoMovePlayer))
+            {
+                Debug.Log("Player clicked: " + hitInfoMovePlayer.transform.name);
+                if(hitInfoMovePlayer.transform.parent.tag == "Player" && hitInfoMovePlayer.transform.parent.gameObject != player)
+                {
+                    StartCoroutine(gameManager.MovePlayerTileByTile(hitInfoMovePlayer.transform.parent.gameObject, startTileID));
+                    sendPlayerToStart = false;
+                }
+            }
+        }
         else
         {
             RaycastHit hitInfo = new RaycastHit();
@@ -541,6 +528,23 @@ public class PlayerActions : MonoBehaviour
         }
     }
 
+    void SendOnePlayerToStart()
+    {
+        diceRoll.SpinTheWheelForCards();
+        Debug.Log("wheel for cards spun");
+        if(diceRoll.cardWheelValue < 4)
+        {
+            Debug.Log("Low number rolled, moving player to start");
+            StartCoroutine(gameManager.MovePlayerTileByTile(player, startTileID));
+            
+        }
+        else if(diceRoll.cardWheelValue >= 4)
+        {
+            Debug.Log("High number rolled, waiting for player selection");
+            sendPlayerToStart = true;
+        }
+    }
+
     IEnumerator MoveCardToDiscard(GameObject card, float delay)
     {
         if (card == null)
@@ -553,6 +557,47 @@ public class PlayerActions : MonoBehaviour
 
         card.transform.position = cardPosDiscard.transform.position;
     }
+
+    IEnumerator MoveCardToDiscardWithEffect(GameObject card, int cardId)
+    {
+        if (card == null)
+            yield break;
+
+        // First, move the card to discard position
+        yield return StartCoroutine(MoveCardToDiscard(card, 5f));
+
+        // Then apply the card effect
+        switch(cardId)
+        {
+            case 4:
+                StartCoroutine(gameManager.MovePlayerTileByTile(player, player.GetComponent<PlayerStats>().currentPos - 2));
+                break;
+            case 5:
+                StartCoroutine(gameManager.MovePlayerTileByTile(player, player.GetComponent<PlayerStats>().currentPos + 2));
+                break;
+            case 6:
+                movePlayer = true;
+                movePlayerForward = true;
+                break;
+            case 7:
+                movePlayer = true;
+                movePlayerBackward = true;
+                break;
+            case 8:
+                playerStats.moveBackwards = true;
+                break;
+            case 9:
+                switchPlaces = true;
+                break;
+            case 10:
+                sendTwoPlayersToStart = true;
+                break;
+            case 11:
+                SendOnePlayerToStart();
+                break;
+        }
+    }
+
     IEnumerator MoveCardToPlayer(GameObject card, float delay)
     {
         if (card == null)

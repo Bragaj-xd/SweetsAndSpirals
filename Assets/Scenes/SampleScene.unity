@@ -2539,6 +2539,7 @@ MonoBehaviour:
   - {fileID: 792971568619854985, guid: 466481b512746204395c1adb858d30eb, type: 3}
   - {fileID: 792971568619854985, guid: cabe60e8990820b4b88de9f89917eda1, type: 3}
   - {fileID: 792971568619854985, guid: 582a87f3046e71e428a2f388962573b5, type: 3}
+  - {fileID: 792971568619854985, guid: e8b7b6e745567e04da7bd3dbe4db5764, type: 3}
   playerPositionNames:
   - Red Position
   - Blue Position
