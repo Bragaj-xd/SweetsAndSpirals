@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEditor;
+using Unity.Netcode;
 
 public class PlayerActions : MonoBehaviour
 {
@@ -22,6 +23,10 @@ public class PlayerActions : MonoBehaviour
     public bool sendTwoPlayersToStart;
     public bool sendPlayerToStart;
     public bool reroll;
+
+    // Network components
+    private NetworkPlayerController networkPlayerController;
+    private bool isNetworkGame = false;
 
     PlayerStats playerStats;
     public GameObject ladder2Prefab;
@@ -54,6 +59,15 @@ public class PlayerActions : MonoBehaviour
     bool leftMouseHeld = false;
 
     int directionIndex = 0;
+
+    private void Awake()
+    {
+        // Initialize player reference early, before Start is called
+        if (player == null)
+        {
+            player = gameObject;
+        }
+    }
 
     readonly Vector3[] ladderDirections =
     {
@@ -99,16 +113,154 @@ public class PlayerActions : MonoBehaviour
     void Start()
     {
         playerStats = GetComponent<PlayerStats>();
+        if (playerStats == null)
+            //Debug.LogWarning($"[PlayerActions] PlayerStats not found on {gameObject.name}!");
+        
         player = gameObject;
-        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
-        uiManager = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
-        rollThree = gameManager.rollThree;
-        floorManager = GameObject.FindGameObjectWithTag("FloorManager").GetComponent<FloorManager>();
-        diceRoll = GameObject.FindGameObjectWithTag("GameManager").GetComponent<DiceRoll>();
-        rollTheDice = gameManager.rollTheDice;
+        
+        // Try to find GameManager, but don't fail if not found yet
+        // It may initialize later
+        TryInitializeGameManager();
+        
+        // Find UIManager safely
+        GameObject uiGO = GameObject.FindGameObjectWithTag("UIManager");
+        if (uiGO != null)
+            uiManager = uiGO.GetComponent<UIManager>();
+        else
+            Debug.LogWarning("[PlayerActions] UIManager tag not found in scene!");
+        
+        // Find FloorManager safely
+        GameObject fmGO = GameObject.FindGameObjectWithTag("FloorManager");
+        if (fmGO != null)
+        {
+            floorManager = fmGO.GetComponent<FloorManager>();
+            if (floorManager != null)
+                Debug.Log("[PlayerActions] FloorManager initialized");
+            else
+                Debug.LogWarning("[PlayerActions] FloorManager component not found on tagged GameObject!");
+        }
+        else
+            Debug.LogWarning("[PlayerActions] FloorManager tag not found in scene!");
+        
+        // Find CardHolder safely
         cardHolder = GameObject.FindGameObjectWithTag("CardHolder");
-        cardPos = gameManager.cardPos;
-        cardPosDiscard = gameManager.cardPosDiscard;
+        if (cardHolder == null)
+            Debug.LogWarning("[PlayerActions] CardHolder tag not found in scene!");
+
+        // Initialize network components
+        networkPlayerController = GetComponent<NetworkPlayerController>();
+        isNetworkGame = networkPlayerController != null && MultiplayerManager.Instance != null && MultiplayerManager.Instance.IsNetworkActive;
+
+        if (isNetworkGame)
+        {
+            //Debug.Log($"[PlayerActions] Network game initialized for {player.name}");
+        }
+        
+        // Log initialization status
+        //Debug.Log($"[PlayerActions] Initialization status for {player.name}:");
+        //Debug.Log($"  PlayerStats: {(playerStats != null ? "OK" : "MISSING")}");
+        //Debug.Log($"  GameManager: {(gameManager != null ? "OK" : "MISSING")}");
+        //Debug.Log($"  FloorManager: {(floorManager != null ? "OK" : "MISSING")}");
+        //Debug.Log($"  DiceRoll: {(diceRoll != null ? "OK" : "MISSING")}");
+    }
+
+    private void TryInitializeGameManager()
+    {
+        // Find GameManager safely
+        GameObject gmGO = GameObject.FindGameObjectWithTag("GameManager");
+        if (gmGO != null)
+        {
+            gameManager = gmGO.GetComponent<GameManager>();
+            if (gameManager != null)
+            {
+                // Successfully found, now set properties
+                rollThree = gameManager.rollThree;
+                rollTheDice = gameManager.rollTheDice;
+                cardPos = gameManager.cardPos;
+                cardPosDiscard = gameManager.cardPosDiscard;
+                
+                // Also get DiceRoll
+                diceRoll = gmGO.GetComponent<DiceRoll>();
+                if (diceRoll == null)
+                    Debug.LogWarning("[PlayerActions] DiceRoll component not found on GameManager!");
+                
+                Debug.Log("[PlayerActions] GameManager initialized successfully");
+                return;
+            }
+            else
+                Debug.LogWarning("[PlayerActions] GameManager component not found on tagged GameObject!");
+        }
+        else
+        {
+            // If we get here, GameManager wasn't found - try alternative search
+            Debug.LogWarning("[PlayerActions] Could not find GameManager by tag - trying FindAnyObjectByType...");
+            gameManager = FindAnyObjectByType<GameManager>();
+            if (gameManager != null)
+            {
+                rollThree = gameManager.rollThree;
+                rollTheDice = gameManager.rollTheDice;
+                cardPos = gameManager.cardPos;
+                cardPosDiscard = gameManager.cardPosDiscard;
+                diceRoll = gameManager.GetComponent<DiceRoll>();
+                Debug.Log("[PlayerActions] GameManager found via FindAnyObjectByType");
+                return;
+            }
+            Debug.LogWarning("[PlayerActions] Could not find GameManager - ensure 'GameManager' tag is set on the GameObject!");
+        }
+    }
+
+    private void TryInitializeFloorManager()
+    {
+        if (floorManager != null)
+            return; // Already initialized
+        
+        GameObject fmGO = GameObject.FindGameObjectWithTag("FloorManager");
+        if (fmGO != null)
+        {
+            floorManager = fmGO.GetComponent<FloorManager>();
+            if (floorManager != null)
+            {
+                Debug.Log("[PlayerActions] FloorManager initialized (lazy)");
+                return;
+            }
+        }
+        
+        // Fallback: Try to find any FloorManager
+        floorManager = FindAnyObjectByType<FloorManager>();
+        if (floorManager != null)
+        {
+            Debug.Log("[PlayerActions] FloorManager found via FindAnyObjectByType");
+            return;
+        }
+        
+        Debug.LogError("[PlayerActions] Could not find FloorManager anywhere in scene!");
+    }
+
+    private void TryInitializeDiceRoll()
+    {
+        if (diceRoll != null)
+            return; // Already initialized
+        
+        // First check if we have gameManager
+        if (gameManager != null)
+        {
+            diceRoll = gameManager.GetComponent<DiceRoll>();
+            if (diceRoll != null)
+            {
+                Debug.Log("[PlayerActions] DiceRoll initialized via GameManager");
+                return;
+            }
+        }
+        
+        // Fallback: Try to find any DiceRoll
+        diceRoll = FindAnyObjectByType<DiceRoll>();
+        if (diceRoll != null)
+        {
+            Debug.Log("[PlayerActions] DiceRoll found via FindAnyObjectByType");
+            return;
+        }
+        
+        Debug.LogError("[PlayerActions] Could not find DiceRoll anywhere in scene!");
     }
 
     public void OnMenu(InputAction.CallbackContext context)
@@ -130,15 +282,24 @@ public class PlayerActions : MonoBehaviour
 
     public void LeftMouseButton(InputAction.CallbackContext context)
     {
-        if(gameManager.activePlayer == player)
+        // In network mode, only process input if this player is the owner
+        if (isNetworkGame && networkPlayerController != null && !networkPlayerController.IsOwner)
         {
-            if (!context.performed)
-                return;
- 
-            if(context.performed && !leftMouseHeld)
-            {
-                HandleLeftClick();
-            }   
+            return;
+        }
+
+        // In local mode, check if this is the active player
+        if (!isNetworkGame && gameManager != null && gameManager.activePlayer != player)
+        {
+            return;
+        }
+
+        if (!context.performed)
+            return;
+
+        if (context.performed && !leftMouseHeld)
+        {
+            HandleLeftClick();
         }
     }
 
@@ -153,6 +314,16 @@ public class PlayerActions : MonoBehaviour
 
     void Update()
     {
+        // Guard: skip if gameManager not initialized
+        if (gameManager == null)
+            return;
+
+        // Guard: ensure player is assigned
+        if (player == null)
+        {
+            player = gameObject;
+        }
+
         if(moveSaL)
         {
             MoveSaL();
@@ -235,6 +406,9 @@ public class PlayerActions : MonoBehaviour
 
     public void MoveSaL()
     {
+        // Only active player can place Ladder/Snake/Jam/Caramel
+        if (gameManager == null || gameManager.activePlayer != player)
+            return;
 
         if (!GetMouseWorldPoint(out Vector3 mouseWorldPos))
             return;
@@ -336,21 +510,60 @@ public class PlayerActions : MonoBehaviour
     //roll three logic
     public void MoveThree()
     {
-        if(gameManager.activePlayer == player)
+        if (gameManager == null)
         {
-            gameManager.UpdatePlayerPosition(player);
-            gameManager.rolledThree = false;
-            rollThree.SetActive(false);
+            TryInitializeGameManager();
         }
         
+        if (gameManager == null)
+        {
+            Debug.LogWarning("[PlayerActions] GameManager not initialized in MoveThree");
+            return;
+        }
+
+        // In network mode, only the owner can use MoveThree
+        if (isNetworkGame && networkPlayerController != null && !networkPlayerController.IsOwner)
+        {
+            Debug.LogWarning("[PlayerActions] Only the owner can use MoveThree");
+            return;
+        }
+
+        // In local mode, only the active player can use MoveThree
+        if (!isNetworkGame && gameManager.activePlayer != player)
+        {
+            Debug.LogWarning("[PlayerActions] Only active player can use MoveThree");
+            return;
+        }
+
+        // Move player by exactly 3 tiles
+        int currentPos = player.GetComponent<PlayerStats>().currentPos;
+        int targetPos = currentPos + 3;
+        
+        StartCoroutine(gameManager.MovePlayerTileByTile(player, targetPos));
+        
+        // Reset the 3-roll state
+        gameManager.rolledThree = false;
+        if (rollThree != null)
+            rollThree.SetActive(false);
     }
     public void PickCard()
     {
+        if (gameManager == null)
+        {
+            TryInitializeGameManager();
+        }
+        
+        if (gameManager == null)
+        {
+            Debug.LogWarning("[PlayerActions] GameManager not initialized in PickCard");
+            return;
+        }
         if(gameManager.activePlayer == player)
         {
             gameManager.AddChanceCard(player);
             gameManager.rolledThree = false;
-            rollThree.SetActive(false);
+            if (rollThree != null)
+                rollThree.SetActive(false);
             
             List<GameObject> cardsToRemove = new List<GameObject>();
             
@@ -373,13 +586,56 @@ public class PlayerActions : MonoBehaviour
             {
                 playerStats.cards.Remove(card);
             }
+            
+            // Explicitly advance turn after picking card
+            StartCoroutine(AdvanceTurnAfterDelay(0.5f));
         }
     }
 
     void HandleLeftClick()
     {
+        // Guard: ensure gameManager is initialized before processing clicks
+        // Try lazy initialization if not found yet
+        if (gameManager == null)
+        {
+            TryInitializeGameManager();
+        }
+
+        // Guard: ensure required components are initialized
+        if (floorManager == null)
+            TryInitializeFloorManager();
+        
+        if (diceRoll == null)
+            TryInitializeDiceRoll();
+        
+        if (playerStats == null)
+        {
+            playerStats = GetComponent<PlayerStats>();
+        }
+        
+        // Final check - if still missing, abort
+        if (floorManager == null || playerStats == null || diceRoll == null)
+        {
+            Debug.LogWarning("[PlayerActions] CRITICAL: Required components still missing - cannot process click. Missing: " +
+                (floorManager == null ? "FloorManager " : "") +
+                (playerStats == null ? "PlayerStats " : "") +
+                (diceRoll == null ? "DiceRoll " : ""));
+            return;
+        }
+
+        // Perform single raycast once at the start and reuse the result
+        RaycastHit hitInfo;
+        bool hitSomething = Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfo);
+
         if (moveSaL)
         {
+            if (saLPreviewScript == null)
+            {
+                Debug.LogWarning("[PlayerActions] SaL preview script is null, cannot finalize placement");
+                moveSaL = false;
+                return;
+            }
+
             if(floorManager.FindTileByID(startTileID).tileFunction != 0 || floorManager.FindTileByID(saLPreviewScript.endTile).tileFunction != 0)
             {
                 Debug.Log("Can't place here!");
@@ -412,126 +668,127 @@ public class PlayerActions : MonoBehaviour
                 rollTheDice.interactable = true;
             saLPreview = null;
             saLPreviewScript = null;
-            gameManager.playerToMove = (gameManager.playerToMove + 1) % gameManager.players.Count;
+            gameManager.AdvanceTurn();
             
         }
-        else if(movePlayer)
+        else if(movePlayer && hitSomething)
         {
-            RaycastHit hitInfoMovePlayer = new RaycastHit();
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfoMovePlayer))
+            GameObject hitObject = hitInfo.transform.parent?.gameObject;
+            if(hitObject != null && hitObject.CompareTag("Player") && hitObject == player)
             {
-                Debug.Log("Player clicked: " + hitInfoMovePlayer.transform.parent.gameObject.name);
-                if(hitInfoMovePlayer.transform.parent.tag == "Player" && hitInfoMovePlayer.transform.parent.gameObject == player)
+                PlayerStats targetStats = hitObject.GetComponent<PlayerStats>();
+                if (targetStats != null)
                 {
                     if(movePlayerForward)
-                        StartCoroutine(gameManager.MovePlayerTileByTile(hitInfoMovePlayer.transform.parent.gameObject,hitInfoMovePlayer.transform.parent.gameObject.GetComponent<PlayerStats>().currentPos + 2));
+                        StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, targetStats.currentPos + 2));
                     else if(movePlayerBackward)
-                        StartCoroutine(gameManager.MovePlayerTileByTile(hitInfoMovePlayer.transform.parent.gameObject,hitInfoMovePlayer.transform.parent.gameObject.GetComponent<PlayerStats>().currentPos - 2));
+                        StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, targetStats.currentPos - 2));
                     movePlayer = false;
                     movePlayerForward = false;
                     movePlayerBackward = false;
                 }
             }
         }
-        else if(switchPlaces)
+        else if(switchPlaces && hitSomething)
         {
-            RaycastHit hitInfoMovePlayer = new RaycastHit();
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfoMovePlayer))
+            GameObject hitObject = hitInfo.transform.parent?.gameObject;
+            if(hitObject != null && hitObject.CompareTag("Player") && hitObject != player)
             {
-                Debug.Log("Player clicked: " + hitInfoMovePlayer.transform.parent.gameObject.name);
-                if(hitInfoMovePlayer.transform.parent.tag == "Player" && hitInfoMovePlayer.transform.parent.gameObject != player)
+                PlayerStats otherStats = hitObject.GetComponent<PlayerStats>();
+                PlayerStats currentStats = player.GetComponent<PlayerStats>();
+                if (otherStats != null && currentStats != null)
                 {
-                    GameObject otherPlayer = hitInfoMovePlayer.transform.parent.gameObject;
-                    int otherPlayerPos = otherPlayer.GetComponent<PlayerStats>().currentPos;
-                    int currentPlayerPos = player.GetComponent<PlayerStats>().currentPos;
-                    otherPlayer.GetComponent<PlayerStats>().ignoreTileEffects = true;
-
-                    StartCoroutine(gameManager.MovePlayerTileByTile(player, otherPlayerPos));
-                    StartCoroutine(gameManager.MovePlayerTileByTile(otherPlayer, currentPlayerPos));
-
+                    otherStats.ignoreTileEffects = true;
+                    StartCoroutine(gameManager.MovePlayerTileByTile(player, otherStats.currentPos));
+                    StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, currentStats.currentPos));
                     switchPlaces = false;
                 }
             }
         }
-        else if(sendTwoPlayersToStart)
+        else if(sendTwoPlayersToStart && hitSomething)
         {
-            RaycastHit hitInfoMovePlayer = new RaycastHit();
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfoMovePlayer))
+            GameObject hitObject = hitInfo.transform.parent?.gameObject;
+            if(hitObject != null && hitObject.CompareTag("Player") && hitObject != player)
             {
-                Debug.Log("Player clicked: " + hitInfoMovePlayer.transform.parent.gameObject.name);
-                if(hitInfoMovePlayer.transform.parent.tag == "Player" && hitInfoMovePlayer.transform.parent.gameObject != player)
-                {
-                    GameObject otherPlayer = hitInfoMovePlayer.transform.parent.gameObject;
-                    StartCoroutine(gameManager.MovePlayerTileByTile(otherPlayer, startTileID));
-                    StartCoroutine(gameManager.MovePlayerTileByTile(player, startTileID));
-                    sendTwoPlayersToStart = false;
-                }
+                StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, startTileID));
+                StartCoroutine(gameManager.MovePlayerTileByTile(player, startTileID));
+                sendTwoPlayersToStart = false;
             }
         }
-        if(sendPlayerToStart)
+        
+        if(sendPlayerToStart && hitSomething)
         {             
-            Debug.Log("Waiting for player click to send to start");
-            RaycastHit hitInfoMovePlayer = new RaycastHit();
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfoMovePlayer))
+            GameObject hitObject = hitInfo.transform.parent?.gameObject;
+            if(hitObject != null && hitObject.CompareTag("Player") && hitObject != player)
             {
-                Debug.Log("Player clicked: " + hitInfoMovePlayer.transform.name);
-                if(hitInfoMovePlayer.transform.parent.tag == "Player" && hitInfoMovePlayer.transform.parent.gameObject != player)
-                {
-                    StartCoroutine(gameManager.MovePlayerTileByTile(hitInfoMovePlayer.transform.parent.gameObject, startTileID));
-                    sendPlayerToStart = false;
-                }
+                StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, startTileID));
+                sendPlayerToStart = false;
             }
         }
-        else
+        else if(hitSomething)
         {
-            RaycastHit hitInfo = new RaycastHit();
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfo) && hitInfo.transform.gameObject == gameManager.wheel)
+            // Check if dice wheel was clicked
+            if (hitInfo.transform.gameObject == gameManager.wheel)
             {
-                diceRoll.SpinTheWheel();
-                Debug.Log("wheel spun");
+                // Only active player can click the wheel
+                if (gameManager.activePlayer != player)
+                {
+                    return; // Ignore wheel clicks from inactive players
+                }
+
+                // Network-aware dice rolling
+                if (isNetworkGame && networkPlayerController != null)
+                {
+                    //Debug.Log("[PlayerActions] Sending dice roll RPC to server");
+                    networkPlayerController.RollDiceServerRpc(mousePos);
+                }
+                else
+                {
+                    // Local mode - direct execution
+                    diceRoll.SpinTheWheel();
+                    //Debug.Log("wheel spun (local mode)");
+                }
+                return; // Early exit to avoid card check
             }
             
-            List<GameObject> cardsToRemove = new List<GameObject>();
-
-            foreach(GameObject card in playerStats.cards)
+            // Check if a card was clicked (only check cards, not all objects)
+            if (playerStats != null && playerStats.cards != null)
             {
-                if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePos), out hitInfo) && hitInfo.transform.gameObject == card)
+                // Cache the hit object to avoid multiple GetComponent calls
+                GameObject hitObject = hitInfo.transform.gameObject;
+                if (playerStats.cards.Contains(hitObject))
                 {
-                    Debug.Log("Card clicked: " + card.name);
-                    CardStats stats = card.GetComponent<CardStats>();
-                    switch(stats.cardId)
+                    CardStats cardStats = hitObject.GetComponent<CardStats>();
+                    if (cardStats != null)
                     {
-                        case 0:
-                            placingType = SaLType.Ladder;
-                            moveSaL = true;
-                            break;
-                        case 1:
-                            placingType = SaLType.Snake;
-                            moveSaL = true;
-                            break;
-                        case 2:
-                            placingType = SaLType.Jam;
-                            moveSaL = true;
-                            break;
-                        case 3:
-                            placingType = SaLType.Caramel;
-                            moveSaL = true;
-                            break;
-                        case 12:
-                            player.GetComponent<PlayerStats>().reroll = true;
-                            break;
+                        //Debug.Log("Card clicked: " + hitObject.name);
+                        switch(cardStats.cardId)
+                        {
+                            case 0:
+                                placingType = SaLType.Ladder;
+                                moveSaL = true;
+                                break;
+                            case 1:
+                                placingType = SaLType.Snake;
+                                moveSaL = true;
+                                break;
+                            case 2:
+                                placingType = SaLType.Jam;
+                                moveSaL = true;
+                                break;
+                            case 3:
+                                placingType = SaLType.Caramel;
+                                moveSaL = true;
+                                break;
+                            case 12:
+                                playerStats.reroll = true;
+                                break;
+                        }
+                        
+                        hitObject.transform.position = cardPosDiscard.transform.position;
+                        playerStats.cards.Remove(hitObject);
                     }
-                    
-                    cardsToRemove.Add(card);
-                    card.transform.position = cardPosDiscard.transform.position;
-                    
-                    
-                    
                 }
-            }
-            foreach (GameObject card in cardsToRemove)
-            {
-                playerStats.cards.Remove(card);
             }
         }
     }
@@ -539,10 +796,10 @@ public class PlayerActions : MonoBehaviour
     void SendOnePlayerToStart()
     {
         diceRoll.SpinTheWheelForCards();
-        Debug.Log("wheel for cards spun");
+        //Debug.Log("wheel for cards spun");
         if(diceRoll.cardWheelValue < 4)
         {
-            Debug.Log("Low number rolled, moving player to start");
+            //Debug.Log("Low number rolled, moving player to start");
             StartCoroutine(gameManager.MovePlayerTileByTile(player, startTileID));
             
         }
@@ -628,11 +885,22 @@ public class PlayerActions : MonoBehaviour
             playerStats.cards[i].transform.localPosition = new Vector3(1.5f * i,0f,0f);
         }
         card.SetActive(false);
-        gameManager.playerToMove = (gameManager.playerToMove + 1) % gameManager.players.Count;
+        // Don't advance turn here - let PickCard handle it
+    }
+
+    IEnumerator AdvanceTurnAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (gameManager != null)
+        {
+            gameManager.AdvanceTurn();
+        }
     }
 
     void ShowActivePlayerCards()
     {
+        if (player == null || playerStats == null)
+            return; // Guard: ensure player and stats exist
         if(player == gameManager.activePlayer)
         {
             foreach (GameObject card in player.GetComponent<PlayerStats>().cards)
@@ -653,7 +921,6 @@ public class PlayerActions : MonoBehaviour
                 }
             }
         }
-        
     }
     void CardHover()
     {

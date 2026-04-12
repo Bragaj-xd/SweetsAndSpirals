@@ -39,6 +39,10 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Guard: check if gameManager is initialized
+        if (gameManager == null)
+            return;
+
         player = gameManager.activePlayer;
         UpdateWinScreen();
         UpdatePlayerToMove();
@@ -52,7 +56,10 @@ public class UIManager : MonoBehaviour
         {
             foreach(GameObject p in gameManager.players)
             {
-                if(p.GetComponent<PlayerStats>().currentPos == floorManager.finishTile.tileID)
+                if (p == null) continue; // Skip null players
+                
+                PlayerStats stats = p.GetComponent<PlayerStats>();
+                if (stats != null && stats.currentPos == floorManager.finishTile.tileID)
                 {
                     winScreen.gameObject.SetActive(true);
                     winScreenText.text = p.name + " Won";
@@ -64,8 +71,36 @@ public class UIManager : MonoBehaviour
     
     void UpdatePlayerToMove()
     {
-        playerToMoveText.text = gameManager.players[gameManager.playerToMove].name + "'s Turn";
-        playerToMoveBackground.GetComponent<UnityEngine.UI.Image>().sprite = player.GetComponent<PlayerStats>().characterSprite;   }
+        // Guard: check if we have players and valid index
+        if (gameManager.players.Count == 0)
+        {
+            Debug.LogWarning("[UIManager] No players registered yet");
+            playerToMoveText.text = "Waiting for players...";
+            return;
+        }
+
+        if (gameManager.playerToMove < 0 || gameManager.playerToMove >= gameManager.players.Count)
+        {
+            //Debug.LogWarning($"[UIManager] playerToMove ({gameManager.playerToMove}) out of bounds for {gameManager.players.Count} players");
+            gameManager.playerToMove = 0; // Reset to first player
+        }
+
+        GameObject currentPlayer = gameManager.players[gameManager.playerToMove];
+        if (currentPlayer != null)
+        {
+            playerToMoveText.text = currentPlayer.name + "'s Turn";
+            
+            // Guard: check if player exists before updating background
+            if (player != null)
+            {
+                PlayerStats stats = player.GetComponent<PlayerStats>();
+                if (stats != null && playerToMoveBackground != null)
+                {
+                    playerToMoveBackground.GetComponent<UnityEngine.UI.Image>().sprite = stats.characterSprite;
+                }
+            }
+        }
+    }
 
 
     public void RollThree()

@@ -59,7 +59,7 @@ public class FloorManager : MonoBehaviour
             }
         }
 
-        Debug.Log($"Generated {idCounter} tiles in zigzag pattern.");
+        //Debug.Log($"Generated {idCounter} tiles in zigzag pattern.");
     }
 
     public int GetRow(int tileID)

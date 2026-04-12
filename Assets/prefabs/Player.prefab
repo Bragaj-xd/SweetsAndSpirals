@@ -124,9 +124,11 @@ GameObject:
   - component: {fileID: -8509981636928148259}
   - component: {fileID: 3647175325378266580}
   - component: {fileID: -1822204231326384453}
+  - component: {fileID: 6529771637193943485}
+  - component: {fileID: -7719067286832744471}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -164,7 +166,10 @@ MonoBehaviour:
   caramelInUse: 0
   jamInUse: 0
   skipNextTurn: 0
+  moveBackwards: 0
   characterSprite: {fileID: 0}
+  ignoreTileEffects: 0
+  reroll: 0
 --- !u!114 &3647175325378266580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,6 +188,13 @@ MonoBehaviour:
   floorManager: {fileID: 0}
   inputMenu: 0
   moveSaL: 0
+  movePlayer: 0
+  movePlayerForward: 0
+  movePlayerBackward: 0
+  switchPlaces: 0
+  sendTwoPlayersToStart: 0
+  sendPlayerToStart: 0
+  reroll: 0
   ladder2Prefab: {fileID: 2004447192422348605, guid: bfbc52f9a5f949c44934f7e1883ad8b7, type: 3}
   ladder3Prefab: {fileID: 4580738175012888092, guid: bc672d475dcc616408ff55914ac0cc51, type: 3}
   ladder4Prefab: {fileID: 3899142054368050999, guid: 353518ea054af204680ea91a2ba0598e, type: 3}
@@ -306,3 +318,41 @@ MonoBehaviour:
   m_DefaultActionMap: Mouse
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &6529771637193943485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2483392702695036206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 166483316
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &-7719067286832744471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2483392702695036206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f208668b5236c2b469f645bc5409b416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkPlayerController
+  ShowTopMostFoldoutHeaderGroup: 1
