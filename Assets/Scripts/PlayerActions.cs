@@ -587,8 +587,7 @@ public class PlayerActions : MonoBehaviour
                 playerStats.cards.Remove(card);
             }
             
-            // Explicitly advance turn after picking card
-            StartCoroutine(AdvanceTurnAfterDelay(0.5f));
+            gameManager.AdvanceTurn();
         }
     }
 
@@ -621,6 +620,11 @@ public class PlayerActions : MonoBehaviour
                 (playerStats == null ? "PlayerStats " : "") +
                 (diceRoll == null ? "DiceRoll " : ""));
             return;
+        }
+
+        if(gameManager.activePlayer != player)
+        {
+            return; // Only active player can interact
         }
 
         // Perform single raycast once at the start and reuse the result
@@ -668,7 +672,7 @@ public class PlayerActions : MonoBehaviour
                 rollTheDice.interactable = true;
             saLPreview = null;
             saLPreviewScript = null;
-            gameManager.AdvanceTurn();
+            
             
         }
         else if(movePlayer && hitSomething)
@@ -885,7 +889,8 @@ public class PlayerActions : MonoBehaviour
             playerStats.cards[i].transform.localPosition = new Vector3(1.5f * i,0f,0f);
         }
         card.SetActive(false);
-        // Don't advance turn here - let PickCard handle it
+        // Explicitly advance turn after picking card
+        gameManager.AdvanceTurn();
     }
 
     IEnumerator AdvanceTurnAfterDelay(float delay)

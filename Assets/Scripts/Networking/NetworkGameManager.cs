@@ -53,6 +53,7 @@ public class NetworkGameManager : NetworkBehaviour
         networkWheelValue.OnValueChanged -= OnWheelValueChanged;
     }
 
+    /*
     /// <summary>
     /// RPC: Update active player on all clients
     /// Note: Server should set networkPlayerToMove directly; this ClientRpc just notifies
@@ -66,7 +67,7 @@ public class NetworkGameManager : NetworkBehaviour
             gameManager.playerToMove = playerIndex;
         }
     }
-
+    */
     /// <summary>
     /// Server method: Update active player and sync to all clients
     /// </summary>
@@ -74,14 +75,14 @@ public class NetworkGameManager : NetworkBehaviour
     {
         if (!IsServer)
         {
-            Debug.LogWarning("[NetworkGameManager] UpdateActivePlayerOnServer called from non-server!");
             return;
         }
 
         // Server writes to NetworkVariable (this triggers OnValueChanged on all clients)
-        networkPlayerToMove.Value = playerIndex;
+        int nextPlayer = (networkPlayerToMove.Value + 1) % gameManager.players.Count;
+        networkPlayerToMove.Value = nextPlayer;
+        Debug.Log(networkPlayerToMove.Value);
     }
-
     /// <summary>
     /// RPC: Move player tile by tile (networked version)
     /// Called on all clients - executes movement without re-broadcasting to prevent infinite loops.
@@ -141,10 +142,10 @@ public class NetworkGameManager : NetworkBehaviour
 
     private void OnPlayerToMoveChanged(int oldValue, int newValue)
     {
-        //Debug.Log($"[NetworkGameManager] Player to move changed: {oldValue} -> {newValue}");
-        if (gameManager != null)
+        if (gameManager != null && newValue < gameManager.players.Count)
         {
             gameManager.playerToMove = newValue;
+            gameManager.activePlayer = gameManager.players[newValue];
         }
     }
 

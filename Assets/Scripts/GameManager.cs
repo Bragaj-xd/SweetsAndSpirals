@@ -326,6 +326,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void OnMoveThreeButton()
+    {
+        if (activePlayer == null) return;
+
+        PlayerActions actions = activePlayer.GetComponent<PlayerActions>();
+        if (actions != null)
+        {
+            actions.MoveThree(); // your existing logic
+        }
+    }
+
+    public void OnPickCardButton()
+    {
+        if (activePlayer == null) return;
+
+        PlayerActions actions = activePlayer.GetComponent<PlayerActions>();
+        if (actions != null)
+        {
+            actions.PickCard();
+        }
+    }
+
     void Update()
     {
         // Guard: check if we have players
@@ -700,9 +722,17 @@ public class GameManager : MonoBehaviour
         // Network sync: broadcast turn change to all clients
         if (isNetworkEnabled && networkGameManager != null)
         {
+            Debug.Log(nextPlayerIndex);
             networkGameManager.UpdateActivePlayerOnServer(nextPlayerIndex);
+            
         }
-    }
+        else
+        {
+            // local mode
+            playerToMove = nextPlayerIndex;
+            activePlayer = players[nextPlayerIndex];
+        }
+        }
 
     private void EndPlayerTurn()
     {
@@ -718,7 +748,24 @@ public class GameManager : MonoBehaviour
             return;
 
         // Use centralized turn advancement
-        AdvanceTurn();
+        if (isNetworkEnabled && networkGameManager != null)
+        {
+            if (networkGameManager.IsServer)
+            {
+                // Host/server changes turn directly
+                AdvanceTurn();
+            }
+            else
+            {
+                // Client requests server to change turn
+                //networkGameManager.RequestTurnChangeServerRpc();
+            }
+        }
+        else
+        {
+            // Local (offline) mode
+            AdvanceTurn();
+        }
     }
 
     // check tileFunction and if snake/ladder move to endpoint (tile-by-tile)
