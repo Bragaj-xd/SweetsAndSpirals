@@ -51,8 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardStats
   cardId: 11
   instantUse: 1
-  cardName: Sweet Rush
-  cardText: After eating candies, you are full of energy. Move two places forward.
+  cardName: Let the die choose who returns to the start
+  cardText: 'Roll 1 to 3 - take the lead, 4 to 6 - your rival concedes. Let the die
+    decide your fate. '
   cardImage: {fileID: 2100000, guid: 0112f12f9c4fab041abcea5820c1ef31, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:

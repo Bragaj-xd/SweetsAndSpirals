@@ -51,10 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardStats
   cardId: 7
   instantUse: 1
-  cardName: Move your opponet X spaces
-  cardText: "Rozsype\u0161 gu\u013Eat\xE9 \u017Euva\u010Dky pod nohy s\xFApera, \u010D\xEDm
-    ho prin\xFAti\u0161 po\u0161mykn\xFA\u0165 sa a spadn\xFA\u0165. Posu\u0148te
-    s\xFApera o X pol\xED\u010Dok dozadu. "
+  cardName: Move your opponet back X spaces
+  cardText: 'You spill round gumballs under you opponents feet making him slip and
+    fall. Move your opponet back X spaces. '
   cardImage: {fileID: 2100000, guid: 282ecf7e2699c6e40a547fe6b174a595, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:

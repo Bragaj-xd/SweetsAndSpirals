@@ -51,8 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardStats
   cardId: 9
   instantUse: 1
-  cardName: Sweet Rush
-  cardText: After eating candies, you are full of energy. Move two places forward.
+  cardName: Change places with an opponent
+  cardText: "Candy chaos! One moment here, the next you\u2019re there \u2014 swap
+    places with your opponent. "
   cardImage: {fileID: 2100000, guid: 8c6da49ab8a3c3c4c8a3238efa20fa1b, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:

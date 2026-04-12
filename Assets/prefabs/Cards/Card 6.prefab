@@ -52,8 +52,8 @@ MonoBehaviour:
   cardId: 6
   instantUse: 1
   cardName: Move your opponet forward X spaces
-  cardText: v pondelok doma nebudem, v utorok na jarmok pojdem a v stredu z jarmoku
-    vo stvrtoks chlapcami do senku
+  cardText: 'Oops! You dropped some treats and your opponent grabbed them first.
+    Move your opponent forward X spaces. '
   cardImage: {fileID: 2100000, guid: 36c1fbd26f69671468669b1419bef35d, type: 2}
 --- !u!65 &-8305058294829829371
 BoxCollider:
