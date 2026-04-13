@@ -24,6 +24,11 @@ public class MultiplayerManager : MonoBehaviour
 
     private Dictionary<ulong, GameObject> playerDictionary = new Dictionary<ulong, GameObject>();
     private bool isNetworkActive = false;
+    
+    // Join code system
+    private string currentJoinCode = "";
+    private static Dictionary<string, string> activeGameCodes = new Dictionary<string, string>(); // code -> host IP
+    public string CurrentJoinCode => currentJoinCode;
 
     private void Awake()
     {
@@ -38,27 +43,11 @@ public class MultiplayerManager : MonoBehaviour
 
     private void Start()
     {
-        InitializeGameMode();
-    }
-
-    private void InitializeGameMode()
-    {
-        switch (currentGameMode)
+        // Don't initialize game mode in menu scene - wait for game scene to load
+        // Only find GameManager if it exists, don't require it
+        if (gameManager == null)
         {
-            case GameMode.SinglePlayer:
-                Debug.Log("[MultiplayerManager] Initializing Single Player");
-                gameManager.SetGameMode(false);
-                break;
-
-            case GameMode.LocalCoOp:
-                Debug.Log("[MultiplayerManager] Initializing Local Co-Op");
-                gameManager.SetGameMode(false);
-                break;
-
-            case GameMode.OnlineMultiplayer:
-                Debug.Log("[MultiplayerManager] Initializing Online Multiplayer");
-                InitializeNetworking();
-                break;
+            gameManager = FindAnyObjectByType<GameManager>();
         }
     }
 
@@ -93,22 +82,46 @@ public class MultiplayerManager : MonoBehaviour
         InitializeNetworking();
         if (networkManager.StartHost())
         {
-            Debug.Log("[MultiplayerManager] Started as Host");
-            gameManager.SetGameMode(true);
+            GenerateAndSetJoinCode();
+            Debug.Log($"[MultiplayerManager] Started as Host with join code: {currentJoinCode}");
+            SetGameModeIfAvailable(true);
         }
         else
         {
             Debug.LogError("[MultiplayerManager] Failed to start as Host");
         }
     }
-
-    public void StartAsClient(string ipAddress = "127.0.0.1")
+    
+    private void GenerateAndSetJoinCode()
     {
+        // Generate a random 6-character alphanumeric code
+        string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        currentJoinCode = "";
+        for (int i = 0; i < 6; i++)
+        {
+            currentJoinCode += chars[Random.Range(0, chars.Length)];
+        }
+        Debug.Log($"[MultiplayerManager] Generated join code: {currentJoinCode}");
+    }
+    
+    public void JoinWithCode(string joinCode)
+    {
+        if (string.IsNullOrEmpty(joinCode))
+        {
+            Debug.LogError("[MultiplayerManager] Join code cannot be empty!");
+            return;
+        }
+        
         currentGameMode = GameMode.OnlineMultiplayer;
         InitializeNetworking();
+        
+        Debug.Log($"[MultiplayerManager] Attempting to join with code: {joinCode}");
+        
+        // For now, assume joining localhost (same machine) - in production, use lobby matching service
         if (networkManager.StartClient())
         {
-            Debug.Log("[MultiplayerManager] Started as Client");
+            Debug.Log("[MultiplayerManager] Started as Client with join code: " + joinCode);
+            SetGameModeIfAvailable(true);
         }
         else
         {
@@ -119,8 +132,31 @@ public class MultiplayerManager : MonoBehaviour
     public void StartLocalGame()
     {
         currentGameMode = GameMode.LocalCoOp;
-        gameManager.SetGameMode(false);
+        SetGameModeIfAvailable(false);
         Debug.Log("[MultiplayerManager] Started Local Co-Op Game");
+    }
+    
+    /// <summary>
+    /// Safely set game mode on GameManager if it's available.
+    /// If GameManager doesn't exist yet (menu scene), it will be found when game scene loads.
+    /// </summary>
+    private void SetGameModeIfAvailable(bool isNetworked)
+    {
+        // Try to find GameManager if not already set
+        if (gameManager == null)
+        {
+            gameManager = FindAnyObjectByType<GameManager>();
+        }
+        
+        // Set game mode if found
+        if (gameManager != null)
+        {
+            gameManager.SetGameMode(isNetworked);
+        }
+        else
+        {
+            Debug.LogWarning("[MultiplayerManager] GameManager not found yet (okay if still in menu scene)");
+        }
     }
 
     private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)

@@ -12,13 +12,11 @@ public class MultiplayerMenuUI : MonoBehaviour
     [SerializeField] private GameObject hostClientPanel;
     [SerializeField] private GameObject joinPanel;
     
-    [SerializeField] private Button localGameButton;
     [SerializeField] private Button hostButton;
     [SerializeField] private Button clientButton;
-    [SerializeField] private Button backButton;
     
     [SerializeField] private Button joinHostButton;
-    [SerializeField] private InputField ipAddressInput;
+    [SerializeField] private TMP_InputField ipAddressInput;
     [SerializeField] private TextMeshProUGUI connectionStatusText;
     
     private MultiplayerManager multiplayerManager;
@@ -39,11 +37,9 @@ public class MultiplayerMenuUI : MonoBehaviour
 
     private void SetupButtons()
     {
-        localGameButton.onClick.AddListener(OnLocalGameClicked);
         hostButton.onClick.AddListener(OnHostClicked);
         clientButton.onClick.AddListener(OnClientClicked);
         joinHostButton.onClick.AddListener(OnJoinHostClicked);
-        backButton.onClick.AddListener(OnBackClicked);
     }
 
     private void OnLocalGameClicked()
@@ -68,15 +64,18 @@ public class MultiplayerMenuUI : MonoBehaviour
 
     private void OnJoinHostClicked()
     {
-        string ipAddress = ipAddressInput.text;
-        if (string.IsNullOrEmpty(ipAddress))
+        string joinCode = ipAddressInput.text;
+        if (string.IsNullOrEmpty(joinCode))
         {
-            ipAddress = "127.0.0.1";
+            Debug.LogWarning("[MultiplayerMenuUI] Join code cannot be empty!");
+            UpdateConnectionStatus("Please enter a join code");
+            return;
         }
         
-        //Debug.Log($"[MultiplayerMenuUI] Joining host at {ipAddress}");
-        multiplayerManager.StartAsClient(ipAddress);
-        UpdateConnectionStatus($"Connecting to {ipAddress}...");
+        joinCode = joinCode.ToUpper().Trim();
+        Debug.Log($"[MultiplayerMenuUI] Joining with code: {joinCode}");
+        multiplayerManager.JoinWithCode(joinCode);
+        UpdateConnectionStatus($"Joining with code {joinCode}...");
     }
 
     private void OnBackClicked()

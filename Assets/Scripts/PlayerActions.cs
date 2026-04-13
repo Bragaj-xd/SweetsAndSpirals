@@ -1024,7 +1024,17 @@ public class PlayerActions : MonoBehaviour
         {
             //Debug.Log("Low number rolled, moving player to start");
             gameManager.IncrementConcurrentMovements();
-            StartCoroutine(gameManager.MovePlayerTileByTile(player, 0));
+            
+            if (isNetworkGame && gameManager.GetComponent<NetworkGameManager>() != null)
+            {
+                int playerIndex = gameManager.players.IndexOf(player);
+                gameManager.GetComponent<NetworkGameManager>().MovePlayerTileByTileServerRpc(playerIndex, 0);
+            }
+            else
+            {
+                StartCoroutine(gameManager.MovePlayerTileByTile(player, 0));
+            }
+            
             StartCoroutine(AdvanceTurnWhenMovementsComplete());
         }
         else if(diceRoll.cardWheelValue >= 4)

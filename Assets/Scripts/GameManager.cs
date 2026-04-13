@@ -12,10 +12,6 @@ using Unity.Netcode;
     <----------------------------------------------------------------------------------------------------------------------->
         TO DO LIST:
     ---------------------
-            Fixes
-        -------------------
-                - fix player position after moving from SaL (asi?)
-        -------------------
             Player Actions
         -------------------
                 - if step on player, move that player back one tile
@@ -26,8 +22,6 @@ using Unity.Netcode;
                 - add card bundle
                 - add card shuffling
 
-                - cards to keep
-
         -------------------
             SaL spawning
         -------------------
@@ -37,12 +31,6 @@ using Unity.Netcode;
             UI
         -------------------
                 - updated UI (graphics shit)
-        -------------------
-            Multiplayer
-        -------------------
-                - redo this shit to multiplayer version (gg we are cooked)
-                - keep both versions local/online multiplayer
-
 
     <----------------------------------------------------------------------------------------------------------------------->
 */
@@ -844,7 +832,7 @@ public class GameManager : MonoBehaviour
         // Cache component lookups to avoid repeated allocations
         PlayerStats playerStats = player.GetComponent<PlayerStats>();
         PlayerStats activePlayerStats = activePlayer.GetComponent<PlayerStats>();
-        PlayerActions activePlayerActions = activePlayer.GetComponent<PlayerActions>();
+        PlayerActions playerActions = player.GetComponent<PlayerActions>();
 
         switch (tile.tileFunction)
         {
@@ -961,11 +949,11 @@ public class GameManager : MonoBehaviour
                 break;
             case 7: //chance
                 //Debug.Log($"{player.name} stepped on a chance tile at {tileID}");
-                if (activePlayerActions != null)
+                if (playerActions != null)
                 {
                     // PickCard() now starts a coroutine that waits for all card effects before advancing
                     // So we don't need to do anything here - PickCard handles the turn advancement
-                    activePlayerActions.PickCard();
+                    playerActions.PickCard();
                     yield break;
                 }
                 else
