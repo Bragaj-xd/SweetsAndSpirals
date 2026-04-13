@@ -170,6 +170,11 @@ MonoBehaviour:
   characterSprite: {fileID: 0}
   ignoreTileEffects: 0
   reroll: 0
+  playerMaterial:
+  - {fileID: 2100000, guid: 4752b478ed87c6f48bb3085fb77bc370, type: 2}
+  - {fileID: 2100000, guid: a729a670c4c79ff4887fa5690e557329, type: 2}
+  - {fileID: 2100000, guid: 5a92a40514ec7ab44b0c1dba62d94753, type: 2}
+  - {fileID: 2100000, guid: 7af777f97dfb22f41aba796028a18e51, type: 2}
 --- !u!114 &3647175325378266580
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -105,11 +105,67 @@ public class UIManager : MonoBehaviour
 
     public void RollThree()
     {
-        if(gameManager.rolledThree)
+        if (!gameManager.rolledThree)
         {
+            rollThree.SetActive(false);
+            return;
+        }
+
+        // In networked games, only show to the active player (owner of that player object)
+        if (gameManager.players.Count > 0)
+        {
+            GameObject activePlayer = gameManager.players[gameManager.playerToMove];
+            
+            // Check if this client controls the active player
+            if (activePlayer != null)
+            {
+                NetworkPlayerController npc = activePlayer.GetComponent<NetworkPlayerController>();
+                if (npc != null && !npc.IsOwner)
+                {
+                    // This client doesn't control the active player, hide UI
+                    rollThree.SetActive(false);
+                }
+                else
+                {
+                    // This client controls the active player, show UI
+                    rollThree.SetActive(true);
+                }
+            }
+        }
+        else
+        {
+            // Local game or no players yet
             rollThree.SetActive(true);
         }
-        
+    }
+
+    // Called by the Move 3 button
+    public void OnMoveThreeButtonClicked()
+    {
+        if (gameManager == null || gameManager.players.Count == 0)
+        {
+            Debug.LogWarning("[UIManager] GameManager or players not initialized in OnMoveThreeButtonClicked");
+            return;
+        }
+
+        // Get the active player
+        GameObject activePlayer = gameManager.players[gameManager.playerToMove];
+        if (activePlayer == null)
+        {
+            Debug.LogWarning("[UIManager] Active player is null in OnMoveThreeButtonClicked");
+            return;
+        }
+
+        // Get the active player's PlayerActions component and call MoveThree
+        PlayerActions playerActions = activePlayer.GetComponent<PlayerActions>();
+        if (playerActions == null)
+        {
+            Debug.LogWarning("[UIManager] PlayerActions component not found on active player");
+            return;
+        }
+
+        Debug.Log($"[UIManager] Calling MoveThree() on {activePlayer.name}");
+        playerActions.MoveThree();
     }
 
     //Pause menu logic

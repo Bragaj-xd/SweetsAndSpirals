@@ -55,21 +55,42 @@ public class NetworkPlayerController : NetworkBehaviour
     [ServerRpc]
     public void RollDiceServerRpc(Vector2 mousePos)
     {
-        // Process dice roll on server
-        ExecuteDiceRollClientRpc(mousePos);
+        // Validate that the caller is the owner of the active player
+        GameManager gameManager = playerActions.gameManager;
+        if (gameManager != null && gameManager.activePlayer != null)
+        {
+            NetworkPlayerController activeNPC = gameManager.activePlayer.GetComponent<NetworkPlayerController>();
+            if (activeNPC == null || activeNPC.OwnerClientId != this.OwnerClientId)
+            {
+                Debug.LogWarning($"[NetworkPlayerController] RollDiceServerRpc rejected: Caller is not the active player");
+                return;
+            }
+        }
+
+        // Server generates the wheel value and syncs to all clients
+        int wheelResult = UnityEngine.Random.Range(1, 7);
+        
+        if (NetworkManager.Singleton != null && NetworkGameManager.Instance != null)
+        {
+            // Sync wheel value through NetworkGameManager
+            NetworkGameManager.Instance.SpinWheelOnServer(wheelResult);
+        }
+        
+        // Execute dice roll on all clients with the server-generated value
+        ExecuteDiceRollClientRpc(wheelResult, mousePos);
     }
 
     [ClientRpc]
-    private void ExecuteDiceRollClientRpc(Vector2 mousePos)
+    private void ExecuteDiceRollClientRpc(int wheelResult, Vector2 mousePos)
     {
         if (playerActions != null)
         {
-            // Get the DiceRoll component and execute the spin
+            // Get the DiceRoll component and set the wheel value
             DiceRoll diceRoll = playerActions.diceRoll;
             if (diceRoll != null)
             {
-                diceRoll.SpinTheWheel();
-                //Debug.Log($"[NetworkPlayerController] Dice rolled by {gameObject.name} - Value: {diceRoll.wheelValue}");
+                diceRoll.SetWheelValue(wheelResult);
+                //Debug.Log($"[NetworkPlayerController] Dice rolled: {wheelResult}");
             }
             else
             {

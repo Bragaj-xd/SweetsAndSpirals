@@ -331,7 +331,9 @@ public class PlayerActions : MonoBehaviour
 
         ShowActivePlayerCards();
 
-        if (gameManager.activePlayer == player)
+        // Check if this player can use CardHover (owner in network, active in local)
+        bool isOwner = isNetworkGame && networkPlayerController != null ? networkPlayerController.IsOwner : (gameManager.activePlayer == player);
+        if (isOwner)
         {
             CardHover();
         }
@@ -407,7 +409,12 @@ public class PlayerActions : MonoBehaviour
     public void MoveSaL()
     {
         // Only active player can place Ladder/Snake/Jam/Caramel
-        if (gameManager == null || gameManager.activePlayer != player)
+        if (gameManager == null)
+            return;
+        
+        // Check if this player can place (owner in network, active in local)
+        bool canPlace = isNetworkGame && networkPlayerController != null ? networkPlayerController.IsOwner : (gameManager.activePlayer == player);
+        if (!canPlace)
             return;
 
         if (!GetMouseWorldPoint(out Vector3 mouseWorldPos))
@@ -506,7 +513,6 @@ public class PlayerActions : MonoBehaviour
         return true;
     }
 
-
     //roll three logic
     public void MoveThree()
     {
@@ -521,13 +527,6 @@ public class PlayerActions : MonoBehaviour
             return;
         }
 
-        // In network mode, only the owner can use MoveThree
-        if (isNetworkGame && networkPlayerController != null && !networkPlayerController.IsOwner)
-        {
-            Debug.LogWarning("[PlayerActions] Only the owner can use MoveThree");
-            return;
-        }
-
         // In local mode, only the active player can use MoveThree
         if (!isNetworkGame && gameManager.activePlayer != player)
         {
@@ -535,16 +534,45 @@ public class PlayerActions : MonoBehaviour
             return;
         }
 
-        // Move player by exactly 3 tiles
-        int currentPos = player.GetComponent<PlayerStats>().currentPos;
-        int targetPos = currentPos + 3;
+        // In network mode, allow any client to move the active player via ServerRpc
+        if (isNetworkGame && networkPlayerController != null)
+        {
+            var networkMgr = gameManager.GetComponent<NetworkGameManager>();
+            if (networkMgr != null)
+            {
+                int playerIndex = gameManager.players.IndexOf(player);
+                if (playerIndex >= 0)
+                {
+                    int currentPos = player.GetComponent<PlayerStats>().currentPos;
+                    int targetPos = currentPos + 3;
+                    networkMgr.MovePlayerTileByTileServerRpc(playerIndex, targetPos);
+                    // Don't execute locally - let the RPC broadcast do it
+                }
+            }
+        }
+        else
+        {
+            // Move player by exactly 3 tiles (local mode)
+            int currentPos = player.GetComponent<PlayerStats>().currentPos;
+            int targetPos = currentPos + 3;
+            
+            StartCoroutine(gameManager.MovePlayerTileByTile(player, targetPos));
+        }
         
-        StartCoroutine(gameManager.MovePlayerTileByTile(player, targetPos));
-        
-        // Reset the 3-roll state
+        // Reset the 3-roll state and sync with network
         gameManager.rolledThree = false;
         if (rollThree != null)
             rollThree.SetActive(false);
+        
+        // Sync with network if available
+        if (isNetworkGame && networkPlayerController != null && gameManager != null)
+        {
+            var networkMgr = gameManager.GetComponent<NetworkGameManager>();
+            if (networkMgr != null)
+                networkMgr.SetRolledThreeOnServerRpc(false);
+        }
+        
+        // DO NOT call AdvanceTurn() here - let HandleTileEffects() handle it after movement completes
     }
     public void PickCard()
     {
@@ -558,37 +586,86 @@ public class PlayerActions : MonoBehaviour
             Debug.LogWarning("[PlayerActions] GameManager not initialized in PickCard");
             return;
         }
-        if(gameManager.activePlayer == player)
+        
+        // Check if this player can act (owner in network mode, active player in local mode)
+        bool canAct = false;
+        if (isNetworkGame && networkPlayerController != null)
         {
-            gameManager.AddChanceCard(player);
-            gameManager.rolledThree = false;
-            if (rollThree != null)
-                rollThree.SetActive(false);
-            
-            List<GameObject> cardsToRemove = new List<GameObject>();
-            
-            foreach (GameObject card in playerStats.cards)
+            canAct = networkPlayerController.IsOwner;
+        }
+        else
+        {
+            canAct = gameManager.activePlayer == player;
+        }
+        
+        if (canAct)
+        {
+            StartCoroutine(HandlePickCard());
+        }
+    }
+
+    private IEnumerator HandlePickCard()
+    {
+        gameManager.AddChanceCard(player);
+        gameManager.rolledThree = false;
+        if (rollThree != null)
+            rollThree.SetActive(false);
+        
+        // Sync with network if available
+        if (isNetworkGame && networkPlayerController != null)
+        {
+            var networkMgr = gameManager.GetComponent<NetworkGameManager>();
+            if (networkMgr != null)
+                networkMgr.SetRolledThreeOnServerRpc(false);
+        }
+        
+        List<GameObject> cardsToRemove = new List<GameObject>();
+        List<Coroutine> cardEffectCoroutines = new List<Coroutine>();
+        
+        foreach (GameObject card in playerStats.cards)
+        {
+            CardStats stats = card.GetComponent<CardStats>();
+            if (stats.instantUse)
             {
-                CardStats stats = card.GetComponent<CardStats>();
-                if (stats.instantUse)
-                {
-                    cardsToRemove.Add(card);
-                    StartCoroutine(MoveCardToDiscardWithEffect(card, stats.cardId));
-                }
-                else
-                {
-                    StartCoroutine(MoveCardToPlayer(card, 5f));
-                }
+                cardsToRemove.Add(card);
+                // Increment counter for each card effect coroutine
+                gameManager.IncrementConcurrentMovements();
+                Coroutine coro = StartCoroutine(MoveCardToDiscardWithEffectTracked(card, stats.cardId));
+                cardEffectCoroutines.Add(coro);
             }
-            
-            // Remove cards after loop completes to avoid modifying collection during iteration
-            foreach (GameObject card in cardsToRemove)
+            else
             {
-                playerStats.cards.Remove(card);
+                StartCoroutine(MoveCardToPlayer(card, 5f));
             }
-            
+        }
+        
+        // Remove cards after loop completes to avoid modifying collection during iteration
+        foreach (GameObject card in cardsToRemove)
+        {
+            playerStats.cards.Remove(card);
+        }
+        
+        // Wait for all card effect coroutines to complete
+        foreach (Coroutine coro in cardEffectCoroutines)
+        {
+            yield return coro;
+        }
+        
+        // Check if any action-requiring cards were used - if so, don't advance turn yet
+        bool hasActionPending = playerStats.moveBackwards || switchPlaces || movePlayer;
+        
+        if (!hasActionPending)
+        {
+            // Now that all card effects are done, advance the turn
             gameManager.AdvanceTurn();
         }
+    }
+
+    IEnumerator MoveCardToDiscardWithEffectTracked(GameObject card, int cardId)
+    {
+        yield return StartCoroutine(MoveCardToDiscardWithEffect(card, cardId));
+        // Decrement counter after effect completes
+        gameManager.DecrementConcurrentMovements();
     }
 
     void HandleLeftClick()
@@ -622,7 +699,9 @@ public class PlayerActions : MonoBehaviour
             return;
         }
 
-        if(gameManager.activePlayer != player)
+        // Check if this player can interact (owner in network, active in local)
+        bool canInteract = isNetworkGame && networkPlayerController != null ? networkPlayerController.IsOwner : (gameManager.activePlayer == player);
+        if (!canInteract)
         {
             return; // Only active player can interact
         }
@@ -650,6 +729,9 @@ public class PlayerActions : MonoBehaviour
             // Finalize this SaL
             if(saLPreviewScript)
                 saLPreviewScript.UpdateEndTile();
+            
+            int salType = (int)placingType; // 0=Ladder, 1=Snake, 2=Jam, 3=Caramel
+            
             switch(placingType)
             {
                 case SaLType.Ladder: 
@@ -667,29 +749,77 @@ public class PlayerActions : MonoBehaviour
                     floorManager.FindTileByID(startTileID).tileFunction = 6;
                     break;
             }
+            
+            // Get the length of the SaL that was placed
+            int salLength = 2; // default
+            if (saLPreview != null)
+            {
+                // Count the segment positions to determine length
+                if (saLPreviewScript != null && saLPreviewScript.segmentPositions != null)
+                {
+                    salLength = saLPreviewScript.segmentPositions.Count;
+                }
+            }
+            
+            // Sync SaL placement to all clients if in network game
+            if (isNetworkGame && networkPlayerController != null && gameManager != null)
+            {
+                var networkMgr = gameManager.GetComponent<NetworkGameManager>();
+                if (networkMgr != null)
+                {
+                    int endTile = (placingType == SaLType.Ladder || placingType == SaLType.Snake) 
+                        ? saLPreviewScript.endTile 
+                        : startTileID; // For Jam and Caramel, endTile is not used
+                    Vector3 placementPos = saLPreview != null ? saLPreview.transform.position : Vector3.zero;
+                    Quaternion placementRot = saLPreview != null ? saLPreview.transform.rotation : Quaternion.identity;
+                    networkMgr.PlaceSaLOnServerRpc(startTileID, endTile, salType, salLength, placementPos, placementRot);
+                }
+            }
+            
             Debug.Log(rollTheDice);
             if(!rollTheDice.interactable)
                 rollTheDice.interactable = true;
             saLPreview = null;
             saLPreviewScript = null;
             
+            // SaL placement complete - advance turn
+            gameManager.AdvanceTurn();
+            
             
         }
         else if(movePlayer && hitSomething)
         {
             GameObject hitObject = hitInfo.transform.parent?.gameObject;
-            if(hitObject != null && hitObject.CompareTag("Player") && hitObject == player)
+            if(hitObject != null && hitObject.CompareTag("Player") && hitObject != player)
             {
                 PlayerStats targetStats = hitObject.GetComponent<PlayerStats>();
                 if (targetStats != null)
                 {
+                    // Track movement for turn advancement
+                    gameManager.IncrementConcurrentMovements();
+                    
+                    int targetPos = targetStats.currentPos;
                     if(movePlayerForward)
-                        StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, targetStats.currentPos + 2));
+                        targetPos += 2;
                     else if(movePlayerBackward)
-                        StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, targetStats.currentPos - 2));
+                        targetPos -= 2;
+
+                    if (isNetworkGame && gameManager.GetComponent<NetworkGameManager>() != null)
+                    {
+                        int targetPlayerIndex = gameManager.players.IndexOf(hitObject);
+                        gameManager.GetComponent<NetworkGameManager>().MovePlayerTileByTileServerRpc(targetPlayerIndex, targetPos);
+                    }
+                    else
+                    {
+                        StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, targetPos));
+                    }
+                    
                     movePlayer = false;
                     movePlayerForward = false;
                     movePlayerBackward = false;
+                    
+                    // After movement completes, advance turn
+                    StartCoroutine(AdvanceTurnWhenMovementsComplete());
                 }
             }
         }
@@ -702,9 +832,41 @@ public class PlayerActions : MonoBehaviour
                 PlayerStats currentStats = player.GetComponent<PlayerStats>();
                 if (otherStats != null && currentStats != null)
                 {
-                    otherStats.ignoreTileEffects = true;
-                    StartCoroutine(gameManager.MovePlayerTileByTile(player, otherStats.currentPos));
-                    StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, currentStats.currentPos));
+                    // Increment counter since we're doing 2 concurrent movements
+                    gameManager.IncrementConcurrentMovements();
+                    gameManager.IncrementConcurrentMovements();
+                    
+                    if (isNetworkGame && networkPlayerController != null && gameManager != null)
+                    {
+                        // Network mode: Use RPC to sync both the ignoreTileEffects flag and movements
+                        int playerIdx = gameManager.players.IndexOf(player);
+                        int otherPlayerIdx = gameManager.players.IndexOf(hitObject);
+                        
+                        if (playerIdx >= 0 && otherPlayerIdx >= 0)
+                        {
+                            var networkMgr = gameManager.GetComponent<NetworkGameManager>();
+                            if (networkMgr != null)
+                            {
+                                // Both players ignore tile effects for switch places
+                                int[] playerIndices = { playerIdx, otherPlayerIdx };
+                                int[] destinations = { otherStats.currentPos, currentStats.currentPos };
+                                int[] ignoreTileEffectsIndices = { otherPlayerIdx }; // Only other player ignores effects
+                                
+                                networkMgr.MovePlayersForCardEffectServerRpc(playerIndices, destinations, ignoreTileEffectsIndices);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Local mode: Direct execution with local flag setting
+                        otherStats.ignoreTileEffects = true;
+                        StartCoroutine(gameManager.MovePlayerTileByTile(player, otherStats.currentPos));
+                        StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, currentStats.currentPos));
+                    }
+                    
+                    // After both movements complete, advance turn
+                    StartCoroutine(AdvanceTurnWhenMovementsComplete());
+                    
                     switchPlaces = false;
                 }
             }
@@ -714,8 +876,36 @@ public class PlayerActions : MonoBehaviour
             GameObject hitObject = hitInfo.transform.parent?.gameObject;
             if(hitObject != null && hitObject.CompareTag("Player") && hitObject != player)
             {
-                StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, startTileID));
-                StartCoroutine(gameManager.MovePlayerTileByTile(player, startTileID));
+                // Increment counter since we're doing 2 concurrent movements
+                gameManager.IncrementConcurrentMovements();
+                gameManager.IncrementConcurrentMovements();
+                
+                if (isNetworkGame && networkPlayerController != null && gameManager != null)
+                {
+                    // Network mode: Use RPC to sync movements
+                    int playerIdx = gameManager.players.IndexOf(player);
+                    int otherPlayerIdx = gameManager.players.IndexOf(hitObject);
+                    
+                    if (playerIdx >= 0 && otherPlayerIdx >= 0)
+                    {
+                        var networkMgr = gameManager.GetComponent<NetworkGameManager>();
+                        if (networkMgr != null)
+                        {
+                            int[] playerIndices = { playerIdx, otherPlayerIdx };
+                            int[] destinations = { startTileID, startTileID };
+                            int[] ignoreTileEffectsIndices = new int[0]; // No one ignores tile effects when sent to start
+                            
+                            networkMgr.MovePlayersForCardEffectServerRpc(playerIndices, destinations, ignoreTileEffectsIndices);
+                        }
+                    }
+                }
+                else
+                {
+                    // Local mode: Direct execution
+                    StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, startTileID));
+                    StartCoroutine(gameManager.MovePlayerTileByTile(player, startTileID));
+                }
+                
                 sendTwoPlayersToStart = false;
             }
         }
@@ -725,8 +915,36 @@ public class PlayerActions : MonoBehaviour
             GameObject hitObject = hitInfo.transform.parent?.gameObject;
             if(hitObject != null && hitObject.CompareTag("Player") && hitObject != player)
             {
-                StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, startTileID));
+                // Track movement for turn advancement
+                gameManager.IncrementConcurrentMovements();
+                
+                if (isNetworkGame && networkPlayerController != null && gameManager != null)
+                {
+                    // Network mode: Use RPC to sync movement
+                    int otherPlayerIdx = gameManager.players.IndexOf(hitObject);
+                    
+                    if (otherPlayerIdx >= 0)
+                    {
+                        var networkMgr = gameManager.GetComponent<NetworkGameManager>();
+                        if (networkMgr != null)
+                        {
+                            int[] playerIndices = { otherPlayerIdx };
+                            int[] destinations = { 0 };  // Start tile is always 0
+                            int[] ignoreTileEffectsIndices = new int[0]; // No one ignores tile effects
+                            
+                            networkMgr.MovePlayersForCardEffectServerRpc(playerIndices, destinations, ignoreTileEffectsIndices);
+                        }
+                    }
+                }
+                else
+                {
+                    // Local mode: Direct execution  
+                    StartCoroutine(gameManager.MovePlayerTileByTile(hitObject, 0));
+                }
+                
                 sendPlayerToStart = false;
+                // After movement completes, advance turn
+                StartCoroutine(AdvanceTurnWhenMovementsComplete());
             }
         }
         else if(hitSomething)
@@ -735,7 +953,8 @@ public class PlayerActions : MonoBehaviour
             if (hitInfo.transform.gameObject == gameManager.wheel)
             {
                 // Only active player can click the wheel
-                if (gameManager.activePlayer != player)
+                bool canClickWheel = isNetworkGame && networkPlayerController != null ? networkPlayerController.IsOwner : (gameManager.activePlayer == player);
+                if (!canClickWheel)
                 {
                     return; // Ignore wheel clicks from inactive players
                 }
@@ -804,8 +1023,9 @@ public class PlayerActions : MonoBehaviour
         if(diceRoll.cardWheelValue < 4)
         {
             //Debug.Log("Low number rolled, moving player to start");
-            StartCoroutine(gameManager.MovePlayerTileByTile(player, startTileID));
-            
+            gameManager.IncrementConcurrentMovements();
+            StartCoroutine(gameManager.MovePlayerTileByTile(player, 0));
+            StartCoroutine(AdvanceTurnWhenMovementsComplete());
         }
         else if(diceRoll.cardWheelValue >= 4)
         {
@@ -839,10 +1059,30 @@ public class PlayerActions : MonoBehaviour
         switch(cardId)
         {
             case 4:
-                StartCoroutine(gameManager.MovePlayerTileByTile(player, player.GetComponent<PlayerStats>().currentPos - 2));
+                gameManager.IncrementConcurrentMovements();
+                if (isNetworkGame && gameManager.GetComponent<NetworkGameManager>() != null)
+                {
+                    int playerIndex = gameManager.players.IndexOf(player);
+                    int targetPos = player.GetComponent<PlayerStats>().currentPos - 2;
+                    gameManager.GetComponent<NetworkGameManager>().MovePlayerTileByTileServerRpc(playerIndex, targetPos);
+                }
+                else
+                {
+                    StartCoroutine(gameManager.MovePlayerTileByTile(player, player.GetComponent<PlayerStats>().currentPos - 2));
+                }
                 break;
             case 5:
-                StartCoroutine(gameManager.MovePlayerTileByTile(player, player.GetComponent<PlayerStats>().currentPos + 2));
+                gameManager.IncrementConcurrentMovements();
+                if (isNetworkGame && gameManager.GetComponent<NetworkGameManager>() != null)
+                {
+                    int playerIndex = gameManager.players.IndexOf(player);
+                    int targetPos = player.GetComponent<PlayerStats>().currentPos + 2;
+                    gameManager.GetComponent<NetworkGameManager>().MovePlayerTileByTileServerRpc(playerIndex, targetPos);
+                }
+                else
+                {
+                    StartCoroutine(gameManager.MovePlayerTileByTile(player, player.GetComponent<PlayerStats>().currentPos + 2));
+                }
                 break;
             case 6:
                 movePlayer = true;
@@ -854,6 +1094,7 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 8:
                 playerStats.moveBackwards = true;
+                rollTheDice.interactable = true;
                 break;
             case 9:
                 switchPlaces = true;
@@ -889,41 +1130,34 @@ public class PlayerActions : MonoBehaviour
             playerStats.cards[i].transform.localPosition = new Vector3(1.5f * i,0f,0f);
         }
         card.SetActive(false);
-        // Explicitly advance turn after picking card
-        gameManager.AdvanceTurn();
+        // DO NOT call AdvanceTurn() here - HandlePickCard() calls it after all cards are placed
     }
 
-    IEnumerator AdvanceTurnAfterDelay(float delay)
+    IEnumerator AdvanceTurnWhenMovementsComplete()
     {
-        yield return new WaitForSeconds(delay);
-        if (gameManager != null)
+        // Wait for all concurrent movements to complete
+        while (gameManager.HasConcurrentMovementsInProgress())
         {
-            gameManager.AdvanceTurn();
+            yield return new WaitForSeconds(0.1f);
         }
+        
+        // All movements done, advance turn
+        gameManager.AdvanceTurn();
     }
 
     void ShowActivePlayerCards()
     {
         if (player == null || playerStats == null)
             return; // Guard: ensure player and stats exist
-        if(player == gameManager.activePlayer)
+        
+        // Check if this player is active (owner in network, active player in local)
+        bool isActive = isNetworkGame && networkPlayerController != null ? networkPlayerController.IsOwner : (player == gameManager.activePlayer);
+        
+        foreach (GameObject card in player.GetComponent<PlayerStats>().cards)
         {
-            foreach (GameObject card in player.GetComponent<PlayerStats>().cards)
+            if (card.transform.IsChildOf(cardHolder.transform))
             {
-                if (card.transform.IsChildOf(cardHolder.transform))
-                {
-                    card.SetActive(true);
-                }
-            }
-        }
-        else
-        {
-            foreach (GameObject card in player.GetComponent<PlayerStats>().cards)
-            {
-                if (card.transform.IsChildOf(cardHolder.transform))
-                {
-                    card.SetActive(false);
-                }
+                card.SetActive(isActive);
             }
         }
     }

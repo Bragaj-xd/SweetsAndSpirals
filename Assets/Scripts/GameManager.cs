@@ -82,6 +82,7 @@ public class GameManager : MonoBehaviour
     // Coroutine tracking for memory leak prevention
     private Coroutine activeMovementCoroutine = null;
     private Dictionary<GameObject, Coroutine> playerMovementCoroutines = new Dictionary<GameObject, Coroutine>();
+    private int concurrentMovementsInProgress = 0; // Track multiple movements from card effects
 
     private void Awake()
     {
@@ -297,6 +298,46 @@ public class GameManager : MonoBehaviour
         // Rename player to player1, player2, etc.
         playerObject.name = $"player{players.Count}";
         
+        // Apply material based on player index
+        int playerIndex = players.Count - 1;
+        PlayerStats playerStats = playerObject.GetComponent<PlayerStats>();
+        if (playerStats != null && playerStats.playerMaterial != null && playerIndex < playerStats.playerMaterial.Count)
+        {
+            Material materialToApply = playerStats.playerMaterial[playerIndex];
+            
+            // Try SkinnedMeshRenderer first (for rigged models) - check player and children
+            SkinnedMeshRenderer skinnedRenderer = playerObject.GetComponent<SkinnedMeshRenderer>();
+            if (skinnedRenderer == null)
+            {
+                skinnedRenderer = playerObject.GetComponentInChildren<SkinnedMeshRenderer>();
+            }
+            
+            if (skinnedRenderer != null)
+            {
+                skinnedRenderer.material = materialToApply;
+                //Debug.Log($"[GameManager] Applied material to {playerObject.name} (SkinnedMeshRenderer)");
+            }
+            else
+            {
+                // Try MeshRenderer (for unrigged models) - check player and children
+                MeshRenderer meshRenderer = playerObject.GetComponent<MeshRenderer>();
+                if (meshRenderer == null)
+                {
+                    meshRenderer = playerObject.GetComponentInChildren<MeshRenderer>();
+                }
+                
+                if (meshRenderer != null)
+                {
+                    meshRenderer.material = materialToApply;
+                    //Debug.Log($"[GameManager] Applied material to {playerObject.name} (MeshRenderer)");
+                }
+                else
+                {
+                    Debug.LogWarning($"[GameManager] No SkinnedMeshRenderer or MeshRenderer found on {playerObject.name} or its children");
+                }
+            }
+        }
+        
         //Debug.Log($"[GameManager] Player registered: {playerObject.name} (Total: {players.Count}/{maxPlayers})");
 
         // Initialize this player's position
@@ -367,6 +408,19 @@ public class GameManager : MonoBehaviour
         if (activePlayer == null)
             return;
 
+        // Update roll button interactability based on active player
+        if (rollTheDice != null)
+        {
+            bool isActivePlayerOnThisClient = !isNetworkEnabled; // In local mode, always true
+            if (isNetworkEnabled && activePlayer != null)
+            {
+                // In network mode, only the owner of the active player can roll
+                NetworkPlayerController npc = activePlayer.GetComponent<NetworkPlayerController>();
+                isActivePlayerOnThisClient = (npc != null && npc.IsOwner);
+            }
+            rollTheDice.interactable = isActivePlayerOnThisClient;
+        }
+
         PlayerStats stats = activePlayer.GetComponent<PlayerStats>();
         if (stats == null)
             return;
@@ -376,6 +430,13 @@ public class GameManager : MonoBehaviour
             //Debug.Log($"{activePlayer.name} skips this turn due to caramel");
 
             stats.skipNextTurn = false; // consume skip
+            
+            // Sync skip reset with network if available
+            if (isNetworkEnabled && networkGameManager != null)
+            {
+                networkGameManager.ResetSkipNextTurnOnServer(playerToMove);
+            }
+            
             EndPlayerTurn(); // Network-aware turn change
             return;
         }
@@ -403,7 +464,13 @@ public class GameManager : MonoBehaviour
             if(diceRoll.wheelValue == 3)
             {
                 //Debug.Log("[GameManager] Rolled a 3!");
-                rolledThree = true;   
+                rolledThree = true;
+                
+                // Sync with network if available
+                if (isNetworkEnabled && networkGameManager != null)
+                {
+                    networkGameManager.SetRolledThreeOnServerRpc(true);
+                }
             }      
         }
     }
@@ -442,6 +509,12 @@ public class GameManager : MonoBehaviour
             targetID = currentPlayerPos + diceRoll.wheelValue - 1;
             activeStats.jamInUse -= 1;
             //Debug.Log($"[GameManager] Jam in use! targetID = {targetID}");
+            
+            // Sync jam counter with network if available
+            if (isNetworkEnabled && networkGameManager != null)
+            {
+                networkGameManager.UpdateJamCounterOnServer(playerToMove, activeStats.jamInUse);
+            }
         }
         else if(activeStats.moveBackwards)
         {
@@ -634,20 +707,8 @@ public class GameManager : MonoBehaviour
 
                 if (id == destinationID)
                 {
-                    if(tile.tileFunction != 7)
-                    {
-                        // Check if player has reroll card active
-                        if(!stats.reroll)
-                        {
-                            // Turn change - update both local and network
-                            EndPlayerTurn();
-                        }
-                        else
-                        {
-                            // Player has reroll - will be consumed after tile effects
-                            //Debug.Log($"{player.name} gets another roll from reroll card!");
-                        }
-                    }
+                    // Don't call EndPlayerTurn here - let HandleTileEffects manage turn advancement
+                    // based on tile function and special effects
                     
                     break;
                 }
@@ -655,10 +716,22 @@ public class GameManager : MonoBehaviour
             }
 
             // After arrival, handle tile effects (ladders/snakes)
+            bool handleTileEffectsWasCalled = false;
             if(!stats.ignoreTileEffects)
+            {
                 yield return StartCoroutine(HandleTileEffects(player, destinationID));
+                handleTileEffectsWasCalled = true;
+            }
+            
             if(stats.ignoreTileEffects)
                 stats.ignoreTileEffects = false;
+            
+            // If HandleTileEffects wasn't called but we have concurrent movements being tracked,
+            // we need to manually decrement the counter
+            if (!handleTileEffectsWasCalled && HasConcurrentMovementsInProgress())
+            {
+                DecrementConcurrentMovements();
+            }
             
             // Re-enable button if player has reroll
             if(stats.reroll)
@@ -699,6 +772,7 @@ public class GameManager : MonoBehaviour
     /// Updates local player turn and syncs via NetworkVariable if in network mode.
     /// </summary>
     /// <summary>
+    /// <summary>
     /// Advance to the next player's turn. This is the centralized way to change turns.
     /// Handles both playerToMove index and activePlayer reference atomically.
     /// Network-aware for synchronized gameplay.
@@ -712,27 +786,20 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Calculate next player index
-        int nextPlayerIndex = (playerToMove + 1) % players.Count;
-        
-        // Update both index and reference atomically
-        playerToMove = nextPlayerIndex;
-        activePlayer = players[nextPlayerIndex];
-
-        // Network sync: broadcast turn change to all clients
         if (isNetworkEnabled && networkGameManager != null)
         {
-            Debug.Log(nextPlayerIndex);
-            networkGameManager.UpdateActivePlayerOnServer(nextPlayerIndex);
-            
+            // Network mode: Let the server update the NetworkVariable
+            // This will trigger OnPlayerToMoveChanged on all clients
+            networkGameManager.UpdateActivePlayerOnServer(playerToMove);
         }
         else
         {
-            // local mode
+            // Local mode: Update directly
+            int nextPlayerIndex = (playerToMove + 1) % players.Count;
             playerToMove = nextPlayerIndex;
             activePlayer = players[nextPlayerIndex];
         }
-        }
+    }
 
     private void EndPlayerTurn()
     {
@@ -781,9 +848,6 @@ public class GameManager : MonoBehaviour
 
         switch (tile.tileFunction)
         {
-            case 0: // nothing xd
-                rollTheDice.interactable = true;
-                break;
             case 1: // ladder start
                 //Debug.Log($"{player.name} stepped on a ladder at {tileID}");
                 for (int i = 0; i < floorManager.ladders.Count; i++)
@@ -799,14 +863,27 @@ public class GameManager : MonoBehaviour
                         if (playerStats != null)
                             playerStats.currentPos = endID;
                         SnapPlayerToTile(player, endID);
-                        rollTheDice.interactable = true;
-                        break; // assume only one ladder per start
+                        
+                        // Decrement counter if this was part of a concurrent movement
+                        if (HasConcurrentMovementsInProgress())
+                            DecrementConcurrentMovements();
+                        
+                        yield break;
                     }
                 }
                 break;
             case 2: // ladder end
-                rollTheDice.interactable = true;
-                break;
+                // Ladder end - just advance turn (player already climbed the ladder)
+                if (!HasConcurrentMovementsInProgress())
+                {
+                    yield return new WaitForSeconds(0.3f);
+                    AdvanceTurn();
+                }
+                else
+                {
+                    DecrementConcurrentMovements();
+                }
+                yield break;
 
             case 3: // snake start
                 //Debug.Log($"{player.name} stepped on a snake at {tileID}");
@@ -823,41 +900,93 @@ public class GameManager : MonoBehaviour
                         if (playerStats != null)
                             playerStats.currentPos = endID;
                         SnapPlayerToTile(player, endID);
-                        rollTheDice.interactable = true;
-                        break; // assume only one snake per start
+                        
+                        // Decrement counter if this was part of a concurrent movement
+                        if (HasConcurrentMovementsInProgress())
+                            DecrementConcurrentMovements();
+                        
+                        yield break;
                     }
                 }
                 break;
             case 4: // snake end
-                rollTheDice.interactable = true;
-                break;
+                // Snake end - just advance turn (player already slid down the snake)
+                if (!HasConcurrentMovementsInProgress())
+                {
+                    yield return new WaitForSeconds(0.3f);
+                    AdvanceTurn();
+                }
+                else
+                {
+                    DecrementConcurrentMovements();
+                }
+                yield break;
             case 5: //jam
                 //Debug.Log($"{player.name} stepped on a jam at {tileID}");
                 if (activePlayerStats != null)
                 {
                     activePlayerStats.jamInUse = 2;
+                    
+                    // Sync jam effect with network if available
+                    if (isNetworkEnabled && networkGameManager != null)
+                    {
+                        networkGameManager.ApplyJamEffectOnServer(playerToMove);
+                    }
                 }
-                rollTheDice.interactable = true;
+                
+                // Decrement counter if this was part of a concurrent movement
+                if (HasConcurrentMovementsInProgress())
+                    DecrementConcurrentMovements();
+                else
+                    AdvanceTurn();
                 break;
             case 6: //caramel
                 //Debug.Log($"{player.name} stepped on a caramel at {tileID}");
                 if (activePlayerStats != null)
                 {
                     activePlayerStats.skipNextTurn = true;
+                    
+                    // Sync skip effect with network if available
+                    if (isNetworkEnabled && networkGameManager != null)
+                    {
+                        networkGameManager.ApplySkipNextTurnOnServer(playerToMove);
+                    }
                 }
-                rollTheDice.interactable = true;
+                
+                // Decrement counter if this was part of a concurrent movement
+                if (HasConcurrentMovementsInProgress())
+                    DecrementConcurrentMovements();
+                else
+                    AdvanceTurn();
                 break;
             case 7: //chance
                 //Debug.Log($"{player.name} stepped on a chance tile at {tileID}");
                 if (activePlayerActions != null)
                 {
+                    // PickCard() now starts a coroutine that waits for all card effects before advancing
+                    // So we don't need to do anything here - PickCard handles the turn advancement
                     activePlayerActions.PickCard();
+                    yield break;
                 }
-                rollTheDice.interactable = false;
-                break;
-            // other tileFunctions (0,2,4) can be handled here if needed
+                else
+                {
+                    // If PickCard failed, let default case handle turn advancement
+                    break;
+                }
             default:
-                yield break;
+                // All other cases (including case 0 - normal tile)
+                // Advance to next player's turn (but only if no concurrent movements are waiting)
+                if (!HasConcurrentMovementsInProgress())
+                {
+                    yield return new WaitForSeconds(0.3f);
+                    AdvanceTurn();
+                }
+                else
+                {
+                    // Decrement the concurrent movement counter
+                    DecrementConcurrentMovements();
+                }
+                break;
         }
     }
 
@@ -887,6 +1016,30 @@ public class GameManager : MonoBehaviour
             // small delay between segment steps
             yield return new WaitForSeconds(0.15f);
         }
+    }
+    
+    /// <summary>
+    /// Call before starting multiple concurrent movements (for card effects like Switch Places)
+    /// </summary>
+    public void IncrementConcurrentMovements()
+    {
+        concurrentMovementsInProgress++;
+    }
+    
+    /// <summary>
+    /// Call after a movement completes to decrement the counter
+    /// </summary>
+    public void DecrementConcurrentMovements()
+    {
+        concurrentMovementsInProgress = Mathf.Max(0, concurrentMovementsInProgress - 1);
+    }
+    
+    /// <summary>
+    /// Check if we're waiting for other movements to complete
+    /// </summary>
+    public bool HasConcurrentMovementsInProgress()
+    {
+        return concurrentMovementsInProgress > 0;
     }
 
     
