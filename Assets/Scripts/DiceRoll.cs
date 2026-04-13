@@ -56,11 +56,21 @@ public class DiceRoll : MonoBehaviour
     
     /// <summary>
     /// Set wheel value from network (synced across all clients)
-    /// This is called via ExecuteDiceRollClientRpc, which is only broadcast after
-    /// server-side validation in RollDiceServerRpc, so no need to validate again here.
     /// </summary>
     public void SetWheelValue(int value)
     {
+        // Only allow the active player to set wheel value
+        if (gameManager != null && gameManager.activePlayer != null)
+        {
+            // Network game: check if this client owns the active player
+            NetworkPlayerController npc = gameManager.activePlayer.GetComponent<NetworkPlayerController>();
+            if (npc != null && !npc.IsOwner)
+            {
+                Debug.LogWarning("[DiceRoll] Only the active player can roll the dice");
+                return;
+            }
+        }
+        
         wheelValue = value;
         Debug.Log("Rolled: " + wheelValue);
         wheelSpinText.text = wheelValue.ToString();

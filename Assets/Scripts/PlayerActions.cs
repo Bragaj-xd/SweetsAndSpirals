@@ -270,6 +270,7 @@ public class PlayerActions : MonoBehaviour
             inputMenu = !inputMenu;
             if (inputMenu)
             {
+                uiManager.DisplayJoinCode(); // Show join code when opening pause menu
                 uiManager.pauseMenuUI.SetActive(true);
             }
             else

@@ -282,6 +282,7 @@ public class GameManager : MonoBehaviour
         }
 
         players.Add(playerObject);
+        Debug.Log($"[GameManager] Player registered: {playerObject.name} (Total: {players.Count}/{maxPlayers})");
         
         // Rename player to player1, player2, etc.
         playerObject.name = $"player{players.Count}";

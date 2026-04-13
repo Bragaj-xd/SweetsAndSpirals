@@ -34,6 +34,14 @@ public class NetworkPlayerController : NetworkBehaviour
         {
             Debug.LogWarning("[NetworkPlayerController] MultiplayerManager not found!");
         }
+        
+        // If only the owner (host) on server side, request state sync from host
+        // This ensures joining clients get all current players
+        if (NetworkManager.Singleton.IsServer && !IsOwner)
+        {
+            // A new player has joined - request host to sync game state to all clients
+            RequestGameStateSyncServerRpc(OwnerClientId);
+        }
     }
 
     private void Start()
@@ -229,5 +237,31 @@ public class NetworkPlayerController : NetworkBehaviour
             playerActions.enabled = false;
         }
         //Debug.Log($"[NetworkPlayerController] {gameObject.name} lost ownership");
+    }
+
+    /// <summary>
+    /// ServerRpc: Request host to sync game state to newly joined client
+    /// </summary>
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    private void RequestGameStateSyncServerRpc(ulong joiningClientId)
+    {
+        GameManager gameManager = FindAnyObjectByType<GameManager>();
+        if (gameManager != null && gameManager.players != null)
+        {
+            Debug.Log($"[NetworkPlayerController] Syncing game state to client {joiningClientId}. Current players: {gameManager.players.Count}");
+            // Sync all current players and game state to the joining client
+            SyncGameStateClientRpc(gameManager.players.Count, gameManager.playerToMove);
+        }
+    }
+
+    /// <summary>
+    /// ClientRpc: Sync game state to all clients (especially newly joined ones)
+    /// </summary>
+    [ClientRpc]
+    private void SyncGameStateClientRpc(int totalPlayers, int activePlayerIndex)
+    {
+        Debug.Log($"[NetworkPlayerController] Received game state sync: {totalPlayers} players, active index: {activePlayerIndex}");
+        // This ensures late joiners are aware of the current game state
+        // InitializePlayerPositions will run and update the UI
     }
 }

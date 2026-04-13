@@ -175,6 +175,11 @@ MonoBehaviour:
   - {fileID: 2100000, guid: a729a670c4c79ff4887fa5690e557329, type: 2}
   - {fileID: 2100000, guid: 5a92a40514ec7ab44b0c1dba62d94753, type: 2}
   - {fileID: 2100000, guid: 7af777f97dfb22f41aba796028a18e51, type: 2}
+  playerToMoveBackgrounds:
+  - {fileID: 21300000, guid: 7605a3f8d589d6443bb72f7ccc5dc5c8, type: 3}
+  - {fileID: 21300000, guid: a6e0865176ddf594882bdee9f4ce7142, type: 3}
+  - {fileID: 21300000, guid: 79550de8f6e45984aaca86cdf404af40, type: 3}
+  - {fileID: 21300000, guid: bed2261ed110ea447b6f89d618d8f136, type: 3}
 --- !u!114 &3647175325378266580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,7 +340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 166483316
+  GlobalObjectIdHash: 1195248793
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1

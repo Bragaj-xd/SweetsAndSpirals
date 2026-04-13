@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -13,5 +14,6 @@ public class PlayerStats : MonoBehaviour
     public bool ignoreTileEffects;
     public bool reroll;
     public List<Material> playerMaterial;
+    public List<Sprite> playerToMoveBackgrounds;
 
 }

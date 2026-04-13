@@ -17,6 +17,7 @@ public class UIManager : MonoBehaviour
     //pause menu references
     public string mainMenuSceneName;
     public GameObject pauseMenuUI;
+    public TextMeshProUGUI joinCodeText; // Join code display in pause menu
 
     public Camera mainCamera;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -89,14 +90,25 @@ public class UIManager : MonoBehaviour
         if (currentPlayer != null)
         {
             playerToMoveText.text = currentPlayer.name + "'s Turn";
-            
-            // Guard: check if player exists before updating background
-            if (player != null)
+        }
+
+        // Update playerToMoveBackground with sprites from the list
+        if (player != null)
+        {
+            PlayerStats stats = player.GetComponent<PlayerStats>();
+            if (stats != null && stats.playerToMoveBackgrounds.Count > 0)
             {
-                PlayerStats stats = player.GetComponent<PlayerStats>();
-                if (stats != null && playerToMoveBackground != null)
+                // Get the sprite for the current player's turn
+                if (gameManager.playerToMove < stats.playerToMoveBackgrounds.Count && stats.playerToMoveBackgrounds[gameManager.playerToMove] != null)
                 {
-                    playerToMoveBackground.GetComponent<UnityEngine.UI.Image>().sprite = stats.characterSprite;
+                    if (playerToMoveBackground != null)
+                    {
+                        Image backgroundImage = playerToMoveBackground.GetComponent<Image>();
+                        if (backgroundImage != null)
+                        {
+                            backgroundImage.sprite = stats.playerToMoveBackgrounds[gameManager.playerToMove];
+                        }
+                    }
                 }
             }
         }
@@ -179,6 +191,35 @@ public class UIManager : MonoBehaviour
         pauseMenuUI.SetActive(false);
     }
 
+    /// <summary>
+    /// Display the join code in the pause menu
+    /// </summary>
+    public void DisplayJoinCode()
+    {
+        if (joinCodeText == null)
+        {
+            Debug.LogWarning("[UIManager] joinCodeText is not assigned in inspector!");
+            return;
+        }
+
+        MultiplayerManager multiplayerManager = MultiplayerManager.Instance;
+        if (multiplayerManager != null)
+        {
+            string code = multiplayerManager.CurrentJoinCode;
+            if (!string.IsNullOrEmpty(code))
+            {
+                joinCodeText.text = $"Join Code: {code}";
+            }
+            else
+            {
+                joinCodeText.text = "Join Code: Not Available";
+            }
+        }
+        else
+        {
+            joinCodeText.text = "Join Code: Not Connected";
+        }
+    }
 }
 
     
